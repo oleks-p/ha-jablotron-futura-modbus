@@ -1,0 +1,107 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Jablotron Futura",
+        "description": "Enter the address of your Futura unit. Modbus TCP must be enabled on the unit, and it accepts only one client at a time.",
+        "data": {
+          "host": "Host",
+          "name": "Name",
+          "port": "Port",
+          "unit_id": "Unit ID"
+        },
+        "data_description": {
+          "name": "Also the start of every entity ID, so each unit needs its own.",
+          "unit_id": "Leave this at 1. The Futura answers only unit ID 1, and addressing another ID makes it drop the connection."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the unit. Check the address, and that nothing else is holding its single Modbus connection.",
+      "invalid_response": "The unit answered but rejected the request.",
+      "name_taken": "Another unit already uses this name, and its entity IDs would collide. Choose a different one.",
+      "not_a_futura": "That device is not a Jablotron Futura.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This Futura is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Polling and optional registers",
+        "data": {
+          "scan_interval": "Poll interval (seconds)",
+          "slow_interval": "Configuration poll interval (seconds)",
+          "enable_corrections": "Sensor temperature offsets",
+          "enable_external_sensors": "External sensor registers",
+          "enable_external_buttons": "External button registers"
+        },
+        "data_description": {
+          "scan_interval": "How often live readings are refreshed. The unit has a single socket, so avoid going below 10 seconds.",
+          "slow_interval": "How often configuration and statistics are refreshed.",
+          "enable_corrections": "Adds the per-sensor temperature offset registers. Each costs an extra Modbus request.",
+          "enable_external_sensors": "Lets Home Assistant push its own temperature, humidity and CO2 readings into the Futura.",
+          "enable_external_buttons": "Exposes the external boost button registers."
+        }
+      }
+    }
+  },
+  "services": {
+    "set_away": {
+      "name": "Set away period",
+      "description": "Sets the holiday period. Times are stored on the unit as local wall-clock time.",
+      "fields": {
+        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
+        "begin": { "name": "Begins", "description": "Defaults to now." },
+        "end": { "name": "Ends", "description": "Defaults to seven days after the start." }
+      }
+    },
+    "clear_away": {
+      "name": "Clear away period",
+      "description": "Cancels the holiday period.",
+      "fields": {
+        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." }
+      }
+    },
+    "set_function": {
+      "name": "Start a timed function",
+      "description": "Runs boost, circulation, overpressure, night or party mode for a given time.",
+      "fields": {
+        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
+        "function": { "name": "Function", "description": "Which function to start." },
+        "duration": { "name": "Duration", "description": "Seconds to run for; 0 stops the function. Night and party accept up to 36000 (10 h), the rest up to 7200 (2 h)." }
+      }
+    },
+    "set_external_sensor": {
+      "name": "Feed an external sensor",
+      "description": "Pushes a Home Assistant reading into one of the Futura's eight external sensor slots so its automatic mode can use it.",
+      "fields": {
+        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
+        "index": { "name": "Slot", "description": "External sensor slot, 1 to 8." },
+        "temperature": { "name": "Temperature", "description": "Air temperature to report." },
+        "humidity": { "name": "Humidity", "description": "Relative humidity to report." },
+        "co2": { "name": "CO2", "description": "CO2 concentration to report." },
+        "floor_temperature": { "name": "Floor temperature", "description": "Floor temperature to report." }
+      }
+    },
+    "unlock_service": {
+      "name": "Unlock service registers",
+      "description": "Attempts to unlock the service register range. Consumer firmware normally refuses this.",
+      "fields": {
+        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
+        "code": { "name": "Code", "description": "Service access code." }
+      }
+    },
+    "write_register": {
+      "name": "Write a holding register",
+      "description": "Escape hatch for holding registers this integration does not model. Writing an unknown register can misconfigure the unit.",
+      "fields": {
+        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
+        "address": { "name": "Address", "description": "Holding register address." },
+        "value": { "name": "Value", "description": "Raw 16-bit value." }
+      }
+    }
+  }
+}

@@ -1,0 +1,93 @@
+set_away:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: jablotron_futura_modbus
+    begin:
+      required: false
+      example: "2026-08-24 08:00:00"
+      selector: { datetime: }
+    end:
+      required: false
+      example: "2026-08-31 18:00:00"
+      selector: { datetime: }
+
+clear_away:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: jablotron_futura_modbus
+
+set_function:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: jablotron_futura_modbus
+    function:
+      required: true
+      selector:
+        select:
+          options: [boost, circulation, overpressure, night, party]
+    duration:
+      required: true
+      example: 3600
+      selector:
+        number:
+          min: 0
+          max: 36000
+          step: 60
+          unit_of_measurement: s
+
+set_external_sensor:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: jablotron_futura_modbus
+    index:
+      required: true
+      selector: { number: { min: 1, max: 8, step: 1 } }
+    temperature:
+      required: false
+      selector: { number: { min: -20, max: 100, step: 0.1, unit_of_measurement: "°C" } }
+    humidity:
+      required: false
+      selector: { number: { min: 0, max: 100, step: 1, unit_of_measurement: "%" } }
+    co2:
+      required: false
+      selector: { number: { min: 0, max: 10000, step: 1, unit_of_measurement: ppm } }
+    floor_temperature:
+      required: false
+      selector: { number: { min: -20, max: 100, step: 0.1, unit_of_measurement: "°C" } }
+
+unlock_service:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: jablotron_futura_modbus
+    code:
+      required: true
+      selector: { number: { min: 0, max: 65535, step: 1, mode: box } }
+
+write_register:
+  fields:
+    device_id:
+      required: false
+      selector:
+        device:
+          integration: jablotron_futura_modbus
+    address:
+      required: true
+      selector: { number: { min: 0, max: 65535, step: 1, mode: box } }
+    value:
+      required: true
+      selector: { number: { min: 0, max: 65535, step: 1, mode: box } }

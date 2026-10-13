@@ -1,0 +1,16 @@
+
+__pycache__/
+.pytest_cache/
+.venv/
+*.py[cod]
+# Local probe output; regenerate with tools/probe_futura.py
+dev-config/
+node_modules/
+registers_observed.json
+.ruff_cache/
+# Local dashboard snapshots taken before edits
+.backups/
+# Editor and OS files
+.idea/
+*.iml
+.DS_Store

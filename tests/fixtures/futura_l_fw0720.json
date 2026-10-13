@@ -1,0 +1,766 @@
+{
+  "accepted_counts": {
+    "holding@0": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "input@0": [
+      1,
+      3,
+      6,
+      8,
+      10,
+      12,
+      14,
+      15,
+      16,
+      18,
+      20,
+      22
+    ]
+  },
+  "alfa": {
+    "1": {
+      "co2": 474,
+      "humi": 45.0,
+      "mb_address": 16,
+      "ntc_temp": 0.0,
+      "options": 0,
+      "temp": 26.3
+    }
+  },
+  "corrections": {
+    "alfa_ntc_temp_corr": {
+      "162": 0,
+      "167": 0,
+      "172": 0,
+      "177": 0,
+      "182": 0,
+      "187": 0,
+      "192": 0,
+      "197": 0
+    },
+    "alfa_temp_corr": {
+      "160": 0,
+      "165": 0,
+      "170": 0,
+      "175": 0,
+      "180": 0,
+      "185": 0,
+      "190": 0,
+      "195": 0
+    },
+    "wall_sensor_temp_corr": {
+      "115": 0,
+      "120": -12,
+      "125": -12,
+      "130": -12,
+      "135": -12,
+      "140": -12,
+      "145": 0,
+      "150": 0
+    },
+    "wall_ui_temp_corr": {
+      "100": 0,
+      "105": 0,
+      "110": 0
+    }
+  },
+  "holding_blocks": {
+    "0..17": {
+      "detail": null,
+      "label": "functions, setpoints, feature enables",
+      "status": "OK",
+      "words": [
+        6,
+        0,
+        0,
+        0,
+        0,
+        0,
+        37105,
+        26872,
+        37105,
+        26872,
+        240,
+        500,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    "20..23": {
+      "detail": null,
+      "label": "VZV zone configuration",
+      "status": "OK",
+      "words": [
+        1,
+        1,
+        50,
+        120
+      ]
+    }
+  },
+  "host": "192.0.2.10",
+  "identity": {
+    "build_number": 0,
+    "device_id": 39,
+    "firmware": "FUA.P.07.20",
+    "firmware_marker": 9999,
+    "hw_revision": 131238,
+    "mac": "00:13:b0:00:00:01",
+    "raw": [
+      39,
+      59904,
+      64086,
+      4864,
+      176,
+      256,
+      166,
+      2,
+      1812,
+      9999,
+      0,
+      0,
+      172,
+      17
+    ],
+    "regmap_version": 1114284,
+    "serial_number": 4200000000
+  },
+  "input_blocks": {
+    "0..21": {
+      "detail": null,
+      "label": "identity + status",
+      "status": "OK",
+      "words": [
+        39,
+        59904,
+        64086,
+        4864,
+        176,
+        256,
+        166,
+        2,
+        1812,
+        9999,
+        0,
+        0,
+        172,
+        17,
+        1,
+        767,
+        388,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "100..114": {
+      "detail": null,
+      "label": "wall UI controllers 1-3",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "115..154": {
+      "detail": null,
+      "label": "wall CO2 sensors 1-8",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        9,
+        32,
+        573,
+        245,
+        483,
+        10,
+        32,
+        662,
+        232,
+        509,
+        11,
+        32,
+        857,
+        239,
+        512,
+        12,
+        32,
+        607,
+        246,
+        472,
+        13,
+        32,
+        612,
+        270,
+        464,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "160..165": {
+      "detail": null,
+      "label": "ALFA slot 1",
+      "status": "OK",
+      "words": [
+        16,
+        0,
+        474,
+        263,
+        450,
+        0
+      ]
+    },
+    "30..38": {
+      "detail": null,
+      "label": "temperatures, humidities, outdoor NTC",
+      "status": "OK",
+      "words": [
+        274,
+        157,
+        237,
+        243,
+        431,
+        812,
+        525,
+        404,
+        273
+      ]
+    },
+    "40..52": {
+      "detail": null,
+      "label": "performance, fans, inputs, RTC battery",
+      "status": "OK",
+      "words": [
+        27,
+        290,
+        1793,
+        0,
+        366,
+        82,
+        77,
+        2649,
+        2913,
+        10583,
+        10591,
+        0,
+        3067
+      ]
+    },
+    "60..75": {
+      "detail": null,
+      "label": "modbus stats + peripheral presence",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        62,
+        0,
+        1,
+        3903,
+        257,
+        783,
+        1,
+        7,
+        1
+      ]
+    },
+    "80..80": {
+      "detail": null,
+      "label": "vzv identify",
+      "status": "OK",
+      "words": [
+        0
+      ]
+    }
+  },
+  "negative_blocks": {
+    "holding:0..23": {
+      "behaved": true,
+      "expected_failure": true,
+      "status": "EXCEPTION",
+      "why": "holding 0..23 spans the 18-19 gap"
+    },
+    "input:14..44": {
+      "behaved": true,
+      "expected_failure": true,
+      "status": "EXCEPTION",
+      "why": "input 14..44 spans the 22-29 and 39 gaps"
+    },
+    "input:160..169": {
+      "behaved": true,
+      "expected_failure": true,
+      "status": "EXCEPTION",
+      "why": "ALFA slot is 10 wide but only 6 registers exist"
+    }
+  },
+  "optional_ranges": {
+    "holding:100..114": {
+      "detail": "ILLEGAL_DATA_ADDRESS",
+      "label": "wall UI temp corrections",
+      "status": "EXCEPTION",
+      "words": null
+    },
+    "holding:115..154": {
+      "detail": "ILLEGAL_DATA_ADDRESS",
+      "label": "wall sensor temp corrections",
+      "status": "EXCEPTION",
+      "words": null
+    },
+    "holding:160..197": {
+      "detail": "ILLEGAL_DATA_ADDRESS",
+      "label": "ALFA temp corrections",
+      "status": "EXCEPTION",
+      "words": null
+    },
+    "holding:300..305": {
+      "detail": null,
+      "label": "external sensor 1",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:310..315": {
+      "detail": null,
+      "label": "external sensor 2",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:320..325": {
+      "detail": null,
+      "label": "external sensor 3",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:330..335": {
+      "detail": null,
+      "label": "external sensor 4",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:340..345": {
+      "detail": null,
+      "label": "external sensor 5",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:350..355": {
+      "detail": null,
+      "label": "external sensor 6",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:360..365": {
+      "detail": null,
+      "label": "external sensor 7",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:370..375": {
+      "detail": null,
+      "label": "external sensor 8",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:400..403": {
+      "detail": null,
+      "label": "external button 1",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:410..413": {
+      "detail": null,
+      "label": "external button 2",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:420..423": {
+      "detail": null,
+      "label": "external button 3",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:430..433": {
+      "detail": null,
+      "label": "external button 4",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:440..443": {
+      "detail": null,
+      "label": "external button 5",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:450..453": {
+      "detail": null,
+      "label": "external button 6",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:460..463": {
+      "detail": null,
+      "label": "external button 7",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:470..473": {
+      "detail": null,
+      "label": "external button 8",
+      "status": "OK",
+      "words": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "holding:900..900": {
+      "detail": null,
+      "label": "access_code",
+      "status": "OK",
+      "words": [
+        0
+      ]
+    },
+    "holding:920..920": {
+      "detail": null,
+      "label": "user_password",
+      "status": "OK",
+      "words": [
+        65535
+      ]
+    },
+    "holding:922..922": {
+      "detail": null,
+      "label": "password_timeout",
+      "status": "OK",
+      "words": [
+        300
+      ]
+    }
+  },
+  "peripherals": {
+    "alfa_slots": [
+      1
+    ],
+    "boost_button_slots": [
+      1,
+      2,
+      3
+    ],
+    "coolbreeze": true,
+    "stat_fails": 0,
+    "stat_reads": 0,
+    "stat_writes": 0,
+    "valve_exhaust": [
+      {
+        "bit": 0,
+        "rs485_unit_id": 96,
+        "valve": 1,
+        "zone": 1
+      },
+      {
+        "bit": 1,
+        "rs485_unit_id": 97,
+        "valve": 1,
+        "zone": 2
+      },
+      {
+        "bit": 2,
+        "rs485_unit_id": 98,
+        "valve": 1,
+        "zone": 3
+      },
+      {
+        "bit": 3,
+        "rs485_unit_id": 99,
+        "valve": 1,
+        "zone": 4
+      },
+      {
+        "bit": 8,
+        "rs485_unit_id": 104,
+        "valve": 2,
+        "zone": 1
+      },
+      {
+        "bit": 9,
+        "rs485_unit_id": 105,
+        "valve": 2,
+        "zone": 2
+      },
+      {
+        "bit": 16,
+        "rs485_unit_id": 112,
+        "valve": 3,
+        "zone": 1
+      }
+    ],
+    "valve_supply": [
+      {
+        "bit": 0,
+        "rs485_unit_id": 64,
+        "valve": 1,
+        "zone": 1
+      },
+      {
+        "bit": 1,
+        "rs485_unit_id": 65,
+        "valve": 1,
+        "zone": 2
+      },
+      {
+        "bit": 2,
+        "rs485_unit_id": 66,
+        "valve": 1,
+        "zone": 3
+      },
+      {
+        "bit": 3,
+        "rs485_unit_id": 67,
+        "valve": 1,
+        "zone": 4
+      },
+      {
+        "bit": 4,
+        "rs485_unit_id": 68,
+        "valve": 1,
+        "zone": 5
+      },
+      {
+        "bit": 5,
+        "rs485_unit_id": 69,
+        "valve": 1,
+        "zone": 6
+      },
+      {
+        "bit": 8,
+        "rs485_unit_id": 72,
+        "valve": 2,
+        "zone": 1
+      },
+      {
+        "bit": 9,
+        "rs485_unit_id": 73,
+        "valve": 2,
+        "zone": 2
+      },
+      {
+        "bit": 10,
+        "rs485_unit_id": 74,
+        "valve": 2,
+        "zone": 3
+      },
+      {
+        "bit": 11,
+        "rs485_unit_id": 75,
+        "valve": 2,
+        "zone": 4
+      },
+      {
+        "bit": 16,
+        "rs485_unit_id": 80,
+        "valve": 3,
+        "zone": 1
+      },
+      {
+        "bit": 24,
+        "rs485_unit_id": 88,
+        "valve": 4,
+        "zone": 1
+      }
+    ],
+    "wall_sensor_slots": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "wall_ui_slots": []
+  },
+  "port": 502,
+  "probed_at_unix": 1787244403,
+  "unit": 1,
+  "wall_sensors": {
+    "2": {
+      "co2": 573,
+      "humi": 48.3,
+      "mb_address": 9,
+      "options": 32,
+      "temp": 24.5
+    },
+    "3": {
+      "co2": 662,
+      "humi": 50.9,
+      "mb_address": 10,
+      "options": 32,
+      "temp": 23.2
+    },
+    "4": {
+      "co2": 857,
+      "humi": 51.2,
+      "mb_address": 11,
+      "options": 32,
+      "temp": 23.9
+    },
+    "5": {
+      "co2": 607,
+      "humi": 47.2,
+      "mb_address": 12,
+      "options": 32,
+      "temp": 24.6
+    },
+    "6": {
+      "co2": 612,
+      "humi": 46.4,
+      "mb_address": 13,
+      "options": 32,
+      "temp": 27.0
+    }
+  },
+  "wall_ui": {}
+}

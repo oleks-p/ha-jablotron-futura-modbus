@@ -1,0 +1,330 @@
+# Jablotron Futura dashboard
+#
+# The integration registers its cards as a Lovelace resource on setup, so nothing
+# needs installing separately. Everything else here is a built-in card.
+#
+# Every entity id below starts with `jablotron_futura`, the first unit's name,
+# and every custom card names the same prefix. For a second unit -- or one set
+# up under another name -- copy this file and replace `jablotron_futura` with
+# that unit's prefix throughout (`jablotron_futura_2`, say). Nothing else needs
+# to change.
+#
+# Sections are deliberately kept small: the sections view balances them across
+# columns, so one very tall section would otherwise leave the other column empty.
+views:
+  - title: Futura
+    path: futura
+    icon: mdi:hvac
+    type: sections
+    max_columns: 2
+    sections:
+      # One schematic at a time, switched by the picker at the top of the right
+      # column: the app's air-flow screen, the unit schematic, the service view,
+      # or the manual's line diagram.
+      #
+      # All four were sections of their own for a while, which meant scrolling
+      # past three drawings of the same unit to reach the readings. To see two at
+      # once, add a second copy of this card with a fixed `variant` and no
+      # `variant_entity`.
+      #
+      # `variant` stays as the fallback for when the helper is unavailable — at
+      # startup, or if it is never created. Create it from
+      # dashboards/futura_helpers.yaml.
+      - type: grid
+        cards:
+          - type: custom:futura-schematics-card
+            prefix: sensor.jablotron_futura
+            variant: flow
+            variant_entity: input_select.futura_schematic
+
+      # The right-hand column. This is the second section and both columns start
+      # empty, so it is the one that reliably lands there — a sections view
+      # otherwise balances sections by height and nothing in the YAML names a
+      # column.
+      - type: grid
+        cards:
+          # The schematic picker: all four views as buttons, one tap each.
+          #
+          # Full width because that is the only width the `select-options` feature
+          # works at. A tile carrying it reports a minimum width, so HA widens it
+          # to the whole section whatever `grid_options` says -- `columns: full` is
+          # written out so the next person does not spend time discovering that.
+          # The alternative is a bare tile, which fits two columns but costs a tap
+          # to open the dialog; four buttons in a row are worth the width.
+          - type: tile
+            entity: input_select.futura_schematic
+            name: Schematic
+            icon: mdi:vector-square
+            features:
+              - type: select-options
+            grid_options:
+              columns: full
+          - type: custom:futura-control-card
+            prefix: sensor.jablotron_futura
+            title: Controls
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Unit
+            heading_style: subtitle
+          - type: tile
+            entity: sensor.jablotron_futura_power_consumption
+            name: Power
+          - type: tile
+            entity: sensor.jablotron_futura_heat_recovered
+            name: Recovered
+          - type: tile
+            entity: sensor.jablotron_futura_air_flow
+            name: Air flow
+          # The indoor mean and humidity mean are not repeated here: the flow
+          # card already prints both, and the climate entity headlines them.
+          - type: tile
+            entity: sensor.jablotron_futura_outdoor_temperature
+            name: Outdoor probe
+          - type: tile
+            entity: sensor.jablotron_futura_supply_fan_speed
+            name: Supply fan
+          - type: tile
+            entity: sensor.jablotron_futura_exhaust_fan_speed
+            name: Exhaust fan
+          - type: tile
+            entity: sensor.jablotron_futura_supply_fan_output
+            name: Supply fan output
+          - type: tile
+            entity: sensor.jablotron_futura_exhaust_fan_output
+            name: Exhaust fan output
+
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Settings
+            heading_style: subtitle
+          # Every writable 0/1 setting the unit has, in register order — which is
+          # also how the spec tabulates them.
+          #
+          # Heating and cooling exist only where fut_config reports the hardware,
+          # so on a unit without them those two tiles will report the entity as
+          # missing. The last two are VarioBreeze settings: their registers are
+          # present on every unit, but they only do anything with zone ventilation
+          # installed.
+          - type: tile
+            entity: switch.jablotron_futura_schedule         # holding 12
+            name: Schedule
+          - type: tile
+            entity: switch.jablotron_futura_radon_protection  # holding 13
+            name: Radon protection
+          - type: tile
+            entity: switch.jablotron_futura_automatic_bypass  # holding 14
+            name: Automatic bypass
+          - type: tile
+            entity: switch.jablotron_futura_additional_heating  # holding 15
+            name: Additional heating
+          - type: tile
+            entity: switch.jablotron_futura_additional_cooling  # holding 16
+            name: Additional cooling
+          - type: tile
+            entity: switch.jablotron_futura_comfort_temperature_control  # 17
+            name: Comfort temperature control
+          # A select, not a switch: 0 = temperature, 1 = CO2. No select-options
+          # feature, so it stays one row and one column like its neighbours --
+          # the current option shows as the tile's state, and a tap opens the
+          # dialog to change it. `features_position: inline` would put the
+          # dropdown on the same row, but the tile card then reports
+          # min_columns: 12 and HA widens it to the full section regardless of
+          # any grid_options set here.
+          - type: tile
+            entity: select.jablotron_futura_zone_auto_priority  # holding 20
+            name: Zone auto priority
+          - type: tile
+            entity: switch.jablotron_futura_kitchen_hood_normally_open  # 21
+            name: Kitchen hood normally open
+
+
+      # Only appears when something is actually wrong.
+      - type: grid
+        cards:
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: binary_sensor.jablotron_futura_fault
+                state: "on"
+            card:
+              type: entities
+              title: Active faults
+              entities:
+                - binary_sensor.jablotron_futura_fault
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: binary_sensor.jablotron_futura_warning
+                state: "on"
+            card:
+              type: entities
+              title: Active warnings
+              entities:
+                - binary_sensor.jablotron_futura_warning
+
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Air quality
+            heading_style: subtitle
+          - type: custom:futura-sensor-grid-card
+            prefix: sensor.jablotron_futura
+            metric: co2
+            columns: 3
+          - type: custom:futura-sensor-grid-card
+            prefix: sensor.jablotron_futura
+            metric: temperature
+            columns: 3
+          - type: custom:futura-sensor-grid-card
+            prefix: sensor.jablotron_futura
+            metric: humidity
+            columns: 3
+
+  # A second view, so the first one carries no charts.
+  #
+  # This is what makes a wall panel viable: `statistics-graph` renders a canvas
+  # per chart, and five of them plus three history cards is the most expensive
+  # thing on this dashboard by a wide margin. Keeping them in their own tab means
+  # the default view is cheap to render. Nothing is duplicated; the cards simply
+  # moved.
+  - title: Trends
+    path: trends
+    icon: mdi:chart-line
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Trends
+            heading_style: subtitle
+          # Every chart plots 5-minute means from statistics rather than raw state
+          # history. Two days of six series polled every 15 s is a thicket of
+          # noise around the shape you actually want to read, and it loads the
+          # full history table to draw it. Five-minute buckets drop the
+          # sample-to-sample jitter while leaving a real step near-vertical --
+          # which matters for power, air flow and fan output, since those jump
+          # when the unit changes speed and then hold. Hourly means drew that
+          # one-second change as an hour-long ramp.
+          #
+          # If you raise days_to_show past a few days, switch to `period: hour`:
+          # Home Assistant purges the 5-minute statistics table long before the
+          # hourly one, so the older end of a long window would simply be empty.
+          #
+          # min_y_axis/max_y_axis with fit_y_data are soft bounds -- the axis
+          # holds still at ordinary readings and still grows for an outlier
+          # instead of clipping it. Without a floor it rescales on every refresh
+          # and a half-degree wobble fills the plot.
+          - type: statistics-graph
+            title: Air temperature
+            days_to_show: 2
+            period: 5minute
+            stat_types:
+              - mean
+            chart_type: line
+            min_y_axis: 0
+            max_y_axis: 35
+            fit_y_data: true
+            entities:
+              - entity: sensor.jablotron_futura_outside_air_temperature
+                name: Outside
+              - entity: sensor.jablotron_futura_supply_air_temperature
+                name: Supply
+              - entity: sensor.jablotron_futura_extract_air_temperature
+                name: Inside
+              - entity: sensor.jablotron_futura_exhaust_air_temperature
+                name: Waste
+              - entity: sensor.jablotron_futura_outdoor_temperature
+                name: Outdoor probe
+          - type: statistics-graph
+            title: Air humidity
+            days_to_show: 2
+            period: 5minute
+            stat_types:
+              - mean
+            chart_type: line
+            min_y_axis: 20
+            max_y_axis: 100
+            fit_y_data: true
+            entities:
+              - entity: sensor.jablotron_futura_outside_air_humidity
+                name: Outside
+              - entity: sensor.jablotron_futura_supply_air_humidity
+                name: Supply
+              - entity: sensor.jablotron_futura_extract_air_humidity
+                name: Inside
+              - entity: sensor.jablotron_futura_exhaust_air_humidity
+                name: Waste
+          # These three discover whichever peripherals the unit has, and default
+          # to the same 5-minute statistics. `raw: true` plots state history
+          # instead; `period: hour` smooths harder.
+          - type: custom:futura-history-card
+            prefix: sensor.jablotron_futura
+            metric: co2
+            hours_to_show: 48
+          - type: custom:futura-history-card
+            prefix: sensor.jablotron_futura
+            metric: temperature
+            hours_to_show: 48
+          - type: custom:futura-history-card
+            prefix: sensor.jablotron_futura
+            metric: humidity
+            hours_to_show: 48
+          - type: statistics-graph
+            title: Power and recovery
+            days_to_show: 2
+            # 5-minute buckets, not hourly: these step when the unit changes
+            # speed and then hold, and an hourly mean turns a one-second change
+            # into an hour-long ramp.
+            period: 5minute
+            stat_types:
+              - mean
+            chart_type: line
+            min_y_axis: 0
+            max_y_axis: 2000
+            fit_y_data: true
+            entities:
+              - entity: sensor.jablotron_futura_power_consumption
+                name: Power
+              - entity: sensor.jablotron_futura_heat_recovered
+                name: Recovered
+          - type: statistics-graph
+            title: Air flow
+            days_to_show: 2
+            # 5-minute buckets, not hourly: these step when the unit changes
+            # speed and then hold, and an hourly mean turns a one-second change
+            # into an hour-long ramp.
+            period: 5minute
+            stat_types:
+              - mean
+            chart_type: line
+            min_y_axis: 0
+            max_y_axis: 400
+            fit_y_data: true
+            entities:
+              - entity: sensor.jablotron_futura_air_flow
+                name: Air flow
+          - type: statistics-graph
+            title: Fan output
+            days_to_show: 2
+            # 5-minute buckets, not hourly: these step when the unit changes
+            # speed and then hold, and an hourly mean turns a one-second change
+            # into an hour-long ramp.
+            period: 5minute
+            stat_types:
+              - mean
+            chart_type: line
+            min_y_axis: 0
+            max_y_axis: 100
+            fit_y_data: true
+            entities:
+              - entity: sensor.jablotron_futura_supply_fan_output
+                name: Supply %
+              - entity: sensor.jablotron_futura_exhaust_fan_output
+                name: Exhaust %

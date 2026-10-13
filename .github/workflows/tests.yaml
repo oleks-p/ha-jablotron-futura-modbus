@@ -1,0 +1,48 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    name: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements_test.txt
+      - run: pip install -r requirements_test.txt
+      - run: pytest -q
+
+  ruff:
+    name: ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install ruff
+      # Settings and the reasons for each exclusion are in .ruff.toml.
+      - run: ruff check custom_components tests tools
+
+  cards:
+    name: cards build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci --prefix cards || npm install --prefix cards
+      - run: npm run --prefix cards typecheck
+      - run: npm run --prefix cards build
+      # The bundle is committed so the integration can serve it without a build
+      # step at install time; CI fails if it drifts from the sources.
+      - name: Verify the committed bundle is current
+        run: git diff --exit-code -- custom_components/jablotron_futura_modbus/www/
