@@ -16,7 +16,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import DOMAIN
 from .coordinator import FuturaCoordinator
 from .entity import FuturaEntity, add_present_entities
-from .registers import REGISTERS, Kind, Reg, Table
+from .registers import REGISTERS, Kind, Reg, Table, is_external_reading
 
 _DEVICE_CLASSES = {
     "temperature": NumberDeviceClass.TEMPERATURE,
@@ -42,6 +42,10 @@ def _is_number(reg: Reg) -> bool:
     if reg.key in _EXCLUDED or reg.kind in (Kind.BITS16, Kind.BITS32):
         return False
     if reg.key.endswith(("_present", "_active")):
+        return False
+    # Written by whatever feeds the slot, and shown as sensors; Home Assistant
+    # feeds a slot through the set_external_sensor service.
+    if is_external_reading(reg):
         return False
     # A number needs a bounded range to render a slider or box.
     return reg.min_value is not None and reg.max_value is not None

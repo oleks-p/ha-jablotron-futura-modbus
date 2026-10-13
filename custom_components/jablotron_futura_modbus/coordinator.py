@@ -17,8 +17,6 @@ from homeassistant.util import dt as ha_dt
 from .block_planner import Block, plan_blocks
 from .const import (
     CONF_ENABLE_CORRECTIONS,
-    CONF_ENABLE_EXTERNAL_BUTTONS,
-    CONF_ENABLE_EXTERNAL_SENSORS,
     CONF_SCAN_INTERVAL,
     CONF_SLOW_INTERVAL,
     DEFAULT_NAME,
@@ -35,6 +33,7 @@ from .registers import (
     CONFIG_BITS,
     DIGITAL_INPUT_BITS,
     ERROR_BITS,
+    EXT_SENSOR_INVALID_BITS,
     MODE_BITS,
     REGISTERS,
     WARNING_BITS,
@@ -47,12 +46,17 @@ from .registers import (
 
 _LOGGER = logging.getLogger(__name__)
 
-#: Peripheral families and how many slots each can hold.
+#: Room-sensor families and how many slots each can hold. External sensors are
+#: room readings too, just written into the unit rather than measured by it.
 PERIPHERAL_FAMILIES: tuple[tuple[str, int], ...] = (
     ("wall_ui", 3),
     ("wall_sensor", 8),
     ("alfa", 8),
+    ("ext_sensor", 8),
 )
+
+#: External slots, each declaring itself in use in its own first register.
+EXTERNAL_SLOTS: tuple[str, ...] = ("ext_sensor", "ext_button")
 
 
 def decode_u32(words: list[int], offset: int) -> int:
@@ -167,26 +171,19 @@ class FuturaCoordinator(DataUpdateCoordinator[FuturaData]):
 
     @staticmethod
     def _active_registers(options: dict[str, Any]) -> tuple[Reg, ...]:
-        """Drop opt-in register groups so they cost no Modbus traffic.
+        """Drop the correction registers unless asked for.
 
-        External sensors and buttons are documented but were reported inert by
-        the community, and the correction registers are strided so each costs a
-        separate request. All three stay out of the poll unless asked for.
+        They are strided with gaps, so each costs a request of its own, and they
+        are set once at commissioning. The external sensor and button slots are
+        strided the same way -- sixteen requests -- but they are read on every
+        slow poll regardless: whether anything feeds them is exactly what the
+        integration has to find out.
         """
-        include_ext_sensors = options.get(CONF_ENABLE_EXTERNAL_SENSORS, False)
-        include_ext_buttons = options.get(CONF_ENABLE_EXTERNAL_BUTTONS, False)
-        include_corrections = options.get(CONF_ENABLE_CORRECTIONS, False)
-
-        active = []
-        for reg in REGISTERS:
-            if reg.key.startswith("ext_sensor_") and not include_ext_sensors:
-                continue
-            if reg.key.startswith("ext_button_") and not include_ext_buttons:
-                continue
-            if reg.key.endswith("_temp_correction") and not include_corrections:
-                continue
-            active.append(reg)
-        return tuple(active)
+        if options.get(CONF_ENABLE_CORRECTIONS, False):
+            return REGISTERS
+        return tuple(
+            reg for reg in REGISTERS if not reg.key.endswith("_temp_correction")
+        )
 
     @property
     def blocks(self) -> tuple[Block, ...]:
@@ -310,6 +307,11 @@ class FuturaCoordinator(DataUpdateCoordinator[FuturaData]):
         slots(data.values.get("connected_alfa"), 8, "alfa_present")
         slots(data.values.get("connected_buttons"), 16, "button_present")
 
+        for family in EXTERNAL_SLOTS:
+            for slot in range(1, 9):
+                if data.values.get(f"{family}_{slot}_present"):
+                    data.present.add(f"{family}_present_{slot}")
+
         if data.flags.get("config_bypass"):
             data.present.add("has_bypass")
         if data.flags.get("config_internal_heating") or data.flags.get(
@@ -337,6 +339,14 @@ class FuturaCoordinator(DataUpdateCoordinator[FuturaData]):
             and round(values["temp_outdoor_ntc"] * 10) == NTC_DISCONNECTED_RAW
         ):
             values["temp_outdoor_ntc"] = None
+
+        # Whatever feeds an external sensor marks the values it has no reading
+        # for, and the register then holds a meaningless number -- usually 0.
+        for slot in range(1, 9):
+            invalid = int(values.get(f"ext_sensor_{slot}_invalid") or 0)
+            for bit, flag in EXT_SENSOR_INVALID_BITS.items():
+                if invalid >> bit & 1:
+                    values[f"ext_sensor_{slot}_{flag.removesuffix('_invalid')}"] = None
 
         power = values.get("power_consumption")
         recovered = values.get("heat_recovered")

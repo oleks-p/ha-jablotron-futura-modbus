@@ -12,7 +12,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, HUMIDITY_PRESETS, MODE_AUTO, MODE_OFF
 from .coordinator import FuturaCoordinator
-from .entity import FuturaEntity
+from .entity import FuturaEntity, add_present_entities
+from .registers import REGISTERS, Reg
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -71,12 +72,44 @@ DESCRIPTIONS: tuple[FuturaSelectDescription, ...] = (
 )
 
 
+#: What an external button does when pressed, as its mode register encodes it.
+EXTERNAL_BUTTON_MODES = {"boost": 0, "kitchen_hood": 1}
+
+
+def external_button_mode(reg: Reg) -> FuturaSelectDescription:
+    """The mode select for one external button slot."""
+    slot = reg.key.removeprefix("ext_button_").removesuffix("_mode")
+    return FuturaSelectDescription(
+        key=reg.key,
+        translation_key="external_button_mode",
+        translation_placeholders={"slot": slot},
+        icon="mdi:gesture-tap-button",
+        entity_category=EntityCategory.CONFIG,
+        options=list(EXTERNAL_BUTTON_MODES),
+        register=reg.key,
+        mapping=EXTERNAL_BUTTON_MODES,
+    )
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator: FuturaCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         FuturaSelect(coordinator, description) for description in DESCRIPTIONS
+    )
+    # One per external button slot, once whatever feeds it marks it in use.
+    add_present_entities(
+        entry,
+        coordinator,
+        async_add_entities,
+        [
+            reg for reg in REGISTERS
+            if reg.key.startswith("ext_button_") and reg.key.endswith("_mode")
+        ],
+        lambda reg: FuturaSelect(
+            coordinator, external_button_mode(reg), gate=reg.available_if
+        ),
     )
 
 

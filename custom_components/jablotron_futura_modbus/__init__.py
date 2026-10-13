@@ -308,7 +308,9 @@ def _async_register_services(hass: HomeAssistant) -> None:
         coordinator = _resolve(hass, call)
         index = call.data["index"]
         base = 300 + (index - 1) * 10
-        await coordinator.client.write_single(base, 1)
+        # Through the coordinator, so the slot's entities appear and show the
+        # values straight away rather than at the next slow poll.
+        await coordinator.async_write_raw("holding", base, 1)
         for offset, key, scale in (
             (2, "temperature", 10),
             (3, "humidity", 1),
@@ -317,8 +319,7 @@ def _async_register_services(hass: HomeAssistant) -> None:
         ):
             if key in call.data:
                 raw = int(round(float(call.data[key]) * scale))
-                await coordinator.client.write_single(base + offset, raw & 0xFFFF)
-        await coordinator.async_request_refresh()
+                await coordinator.async_write_raw("holding", base + offset, raw & 0xFFFF)
 
     async def unlock_service(call: ServiceCall) -> None:
         coordinator = _resolve(hass, call)

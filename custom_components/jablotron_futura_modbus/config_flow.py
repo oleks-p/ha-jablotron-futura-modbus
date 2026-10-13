@@ -20,8 +20,6 @@ from homeassistant.util import slugify
 
 from .const import (
     CONF_ENABLE_CORRECTIONS,
-    CONF_ENABLE_EXTERNAL_BUTTONS,
-    CONF_ENABLE_EXTERNAL_SENSORS,
     CONF_SCAN_INTERVAL,
     CONF_SLOW_INTERVAL,
     CONF_UNIT_ID,
@@ -184,14 +182,6 @@ class FuturaOptionsFlow(OptionsFlow):
                 vol.Optional(
                     CONF_ENABLE_CORRECTIONS,
                     default=options.get(CONF_ENABLE_CORRECTIONS, False),
-                ): cv.boolean,
-                vol.Optional(
-                    CONF_ENABLE_EXTERNAL_SENSORS,
-                    default=options.get(CONF_ENABLE_EXTERNAL_SENSORS, False),
-                ): cv.boolean,
-                vol.Optional(
-                    CONF_ENABLE_EXTERNAL_BUTTONS,
-                    default=options.get(CONF_ENABLE_EXTERNAL_BUTTONS, False),
                 ): cv.boolean,
             }
         )

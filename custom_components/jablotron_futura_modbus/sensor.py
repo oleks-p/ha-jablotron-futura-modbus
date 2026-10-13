@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -18,7 +19,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import DOMAIN
 from .coordinator import FuturaCoordinator
 from .entity import FuturaEntity, add_present_entities
-from .registers import REGISTERS, Kind, Reg
+from .registers import REGISTERS, Kind, Reg, is_external_reading
 
 #: Register kinds that are bitfields or identity strings rather than readings.
 _NON_SENSOR_KINDS = {Kind.BITS16, Kind.BITS32}
@@ -63,8 +64,9 @@ def _is_sensor(reg: Reg) -> bool:
     if reg.key in _HANDLED_ELSEWHERE:
         return False
     # Writable holding registers become numbers/switches/selects, except the
-    # function timers, which are also useful as read-only countdowns.
-    if reg.writable and not reg.key.endswith("_timer"):
+    # function timers, which are also useful as read-only countdowns, and the
+    # external sensors, whose values are readings that something else wrote.
+    if reg.writable and not (reg.key.endswith("_timer") or is_external_reading(reg)):
         return False
     if reg.key.endswith("_temp_correction"):
         return False
@@ -157,6 +159,53 @@ VALVE_COUNTS: tuple[tuple[str, str], ...] = (
 )
 
 
+@dataclass(frozen=True, kw_only=True)
+class FuturaSlotCountDescription(SensorEntityDescription):
+    """Counts the slots of one kind that are in use."""
+
+    #: Presence flag prefix in `FuturaData.present`; the slot number follows.
+    presence: str
+    slots: int
+    #: A value that has to have been read before the count means anything, with
+    #: `{slot}` standing for each slot where every slot has its own register.
+    source: str
+
+
+SLOT_COUNTS: tuple[FuturaSlotCountDescription, ...] = (
+    # Boost buttons wired to the unit's bus. The map reports only which slots
+    # are fitted -- no per-button state -- so a count is all there is to show.
+    FuturaSlotCountDescription(
+        key="boost_button_count",
+        name="Boost buttons",
+        icon="mdi:gesture-tap-button",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        presence="button_present",
+        slots=16,
+        source="connected_buttons",
+    ),
+    # External slots are filled in by another system. Each one in use gets its
+    # own entities; these say how many there are, including when it is none.
+    FuturaSlotCountDescription(
+        key="external_sensor_count",
+        name="External sensors",
+        icon="mdi:thermometer-lines",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        presence="ext_sensor_present",
+        slots=8,
+        source="ext_sensor_{slot}_present",
+    ),
+    FuturaSlotCountDescription(
+        key="external_button_count",
+        name="External buttons",
+        icon="mdi:gesture-tap-button",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        presence="ext_button_present",
+        slots=8,
+        source="ext_button_{slot}_present",
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -170,6 +219,7 @@ async def async_setup_entry(
         FuturaValveCountSensor(coordinator, side, label)
         for side, label in VALVE_COUNTS
     ]
+    entities += [FuturaSlotCountSensor(coordinator, desc) for desc in SLOT_COUNTS]
     async_add_entities(entities)
 
     # Gated registers arrive as their peripheral is seen, which for a slot that
@@ -189,6 +239,29 @@ class FuturaSensor(FuturaEntity, SensorEntity):
     @property
     def native_value(self) -> Any:
         return self.coordinator.data.get(self.entity_description.key)
+
+
+class FuturaSlotCountSensor(FuturaEntity, SensorEntity):
+    """How many slots of one kind are in use, and which."""
+
+    entity_description: FuturaSlotCountDescription
+
+    def _in_use(self) -> list[int] | None:
+        desc = self.entity_description
+        data = self.coordinator.data
+        slots = range(1, desc.slots + 1)
+        if not any(desc.source.format(slot=slot) in data.values for slot in slots):
+            return None
+        return [slot for slot in slots if f"{desc.presence}_{slot}" in data.present]
+
+    @property
+    def native_value(self) -> int | None:
+        in_use = self._in_use()
+        return None if in_use is None else len(in_use)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {"slots": self._in_use() or []}
 
 
 class FuturaValveCountSensor(FuturaEntity, SensorEntity):

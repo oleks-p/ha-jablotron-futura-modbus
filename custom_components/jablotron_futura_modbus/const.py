@@ -15,8 +15,6 @@ SUPPORTED_UNIT_ID: Final = 1
 CONF_UNIT_ID: Final = "unit_id"
 CONF_SCAN_INTERVAL: Final = "scan_interval"
 CONF_SLOW_INTERVAL: Final = "slow_interval"
-CONF_ENABLE_EXTERNAL_SENSORS: Final = "enable_external_sensors"
-CONF_ENABLE_EXTERNAL_BUTTONS: Final = "enable_external_buttons"
 CONF_ENABLE_CORRECTIONS: Final = "enable_corrections"
 
 DEFAULT_SCAN_INTERVAL: Final = 15

@@ -101,13 +101,14 @@ export const METRICS: Record<
 };
 
 /**
- * Peripheral reading entities: wall controllers, CO2 sensors and ALFA units.
+ * Peripheral reading entities: wall controllers, CO2 sensors, ALFA units, and
+ * the external sensor slots another system writes into the unit.
  *
  * Matching on the slot pattern rather than a fixed list keeps every card working
  * on any Futura, whatever mix of peripherals it has — the integration only
  * creates entities for slots that are actually populated.
  */
-const PERIPHERAL_SLOT = /^_(alfa|co2_sensor|wall_controller)_\d+_/;
+const PERIPHERAL_SLOT = /^_(alfa|co2_sensor|wall_controller|external_sensor)_\d+_/;
 
 /** Every entity reporting `metric` for a connected peripheral, sorted. */
 export function discoverPeripherals(
@@ -125,8 +126,9 @@ export function discoverPeripherals(
       // -- and this is what keeps them off the first unit's cards. It also
       // excludes the unit's own duct probes and the derived summaries.
       if (!PERIPHERAL_SLOT.test(id.slice(prefix.length))) return false;
-      // The ALFA's optional NTC input is a separate probe, not a room reading.
-      return !id.includes('_ntc_');
+      // The ALFA's optional NTC input and an external sensor's floor probe are
+      // not room-air readings.
+      return !id.includes('_ntc_') && !id.includes('_floor_');
     })
     .sort();
 }

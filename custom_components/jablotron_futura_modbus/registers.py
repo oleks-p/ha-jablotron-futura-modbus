@@ -439,57 +439,74 @@ def _corrections() -> list[Reg]:
 
 
 def _external() -> list[Reg]:
-    """External sensor and button registers.
+    """External sensors and buttons: slots another system fills in.
 
-    Documented as writable so Home Assistant can feed its own sensors into the
-    Futura. Forum reports claimed these were inert; on FW 7.20 they read back
-    cleanly and slot 3's button timer was observed counting down, which suggests
-    the block does track real peripherals. Off by default until confirmed.
+    Unlike the wall sensors and ALFAs these are not devices on the unit's bus but
+    holding registers a third party writes for the unit to use -- a building
+    controller, or Home Assistant through `set_external_sensor`. Each slot says
+    whether it is in use in its own first register, so that flag is read for all
+    sixteen slots, and the rest of a slot only becomes entities once it is set.
+    On FW 7.20 every slot reads back cleanly, and an unused one is all zeros.
+
+    The readings are writable, but they are shown as sensors: what they hold is
+    whatever the feeding system last wrote, which is a reading like any other.
     """
     regs: list[Reg] = []
     for slot in range(1, 9):
         base = 300 + (slot - 1) * 10
+        gate = f"ext_sensor_present_{slot}"
         regs += [
             Reg(f"ext_sensor_{slot}_present", Table.HOLDING, base, writable=True,
                 tier=Tier.SLOW, name=f"External sensor {slot} present",
                 config=True, enabled_default=False),
             Reg(f"ext_sensor_{slot}_invalid", Table.HOLDING, base + 1, Kind.BITS16,
                 tier=Tier.SLOW, name=f"External sensor {slot} invalid flags",
-                diagnostic=True, enabled_default=False),
+                diagnostic=True, available_if=gate),
             Reg(f"ext_sensor_{slot}_temperature", Table.HOLDING, base + 2, Kind.I16,
                 scale=0.1, writable=True, tier=Tier.SLOW, unit="°C",
+                device_class="temperature", state_class="measurement",
                 name=f"External sensor {slot} temperature",
-                min_value=-20, max_value=100, step=0.1, enabled_default=False),
+                min_value=-20, max_value=100, step=0.1, available_if=gate),
             Reg(f"ext_sensor_{slot}_humidity", Table.HOLDING, base + 3, writable=True,
-                tier=Tier.SLOW, unit="%", name=f"External sensor {slot} humidity",
-                min_value=0, max_value=100, step=1, enabled_default=False),
+                tier=Tier.SLOW, unit="%", device_class="humidity",
+                state_class="measurement", name=f"External sensor {slot} humidity",
+                min_value=0, max_value=100, step=1, available_if=gate),
             Reg(f"ext_sensor_{slot}_co2", Table.HOLDING, base + 4, writable=True,
-                tier=Tier.SLOW, unit="ppm", name=f"External sensor {slot} CO2",
-                min_value=0, max_value=10000, step=1, enabled_default=False),
+                tier=Tier.SLOW, unit="ppm", device_class="carbon_dioxide",
+                state_class="measurement", name=f"External sensor {slot} CO2",
+                min_value=0, max_value=10000, step=1, available_if=gate),
             Reg(f"ext_sensor_{slot}_floor_temperature", Table.HOLDING, base + 5,
                 Kind.I16, scale=0.1, writable=True, tier=Tier.SLOW, unit="°C",
+                device_class="temperature", state_class="measurement",
                 name=f"External sensor {slot} floor temperature",
-                min_value=-20, max_value=100, step=0.1, enabled_default=False),
+                min_value=-20, max_value=100, step=0.1, available_if=gate),
         ]
     for slot in range(1, 9):
         base = 400 + (slot - 1) * 10
+        gate = f"ext_button_present_{slot}"
         regs += [
             Reg(f"ext_button_{slot}_present", Table.HOLDING, base, writable=True,
                 tier=Tier.SLOW, name=f"External button {slot} present",
                 config=True, enabled_default=False),
             Reg(f"ext_button_{slot}_mode", Table.HOLDING, base + 1, writable=True,
                 tier=Tier.SLOW, name=f"External button {slot} mode",
-                config=True, enabled_default=False,
-                note="0 = boost, 1 = kitchen hood"),
+                config=True, available_if=gate, note="0 = boost, 1 = kitchen hood"),
             Reg(f"ext_button_{slot}_timer", Table.HOLDING, base + 2, writable=True,
                 tier=Tier.SLOW, unit="s", device_class="duration",
                 name=f"External button {slot} timer",
-                min_value=0, max_value=10800, step=60, enabled_default=False),
+                min_value=0, max_value=10800, step=60, available_if=gate),
             Reg(f"ext_button_{slot}_active", Table.HOLDING, base + 3, writable=True,
                 tier=Tier.SLOW, name=f"External button {slot} active",
-                enabled_default=False, note="limited to 3 hours by the unit"),
+                available_if=gate, note="limited to 3 hours by the unit"),
         ]
     return regs
+
+
+def is_external_reading(reg: Reg) -> bool:
+    """An external sensor's value, shown as a sensor although it is writable."""
+    return reg.key.startswith("ext_sensor_") and not reg.key.endswith(
+        ("_present", "_invalid")
+    )
 
 
 def _service() -> list[Reg]:

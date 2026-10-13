@@ -34,16 +34,12 @@
         "data": {
           "scan_interval": "Poll interval (seconds)",
           "slow_interval": "Configuration poll interval (seconds)",
-          "enable_corrections": "Sensor temperature offsets",
-          "enable_external_sensors": "External sensor registers",
-          "enable_external_buttons": "External button registers"
+          "enable_corrections": "Sensor temperature offsets"
         },
         "data_description": {
           "scan_interval": "How often live readings are refreshed. The unit has a single socket, so avoid going below 10 seconds.",
           "slow_interval": "How often configuration and statistics are refreshed.",
-          "enable_corrections": "Adds the per-sensor temperature offset registers. Each costs an extra Modbus request.",
-          "enable_external_sensors": "Lets Home Assistant push its own temperature, humidity and CO2 readings into the Futura.",
-          "enable_external_buttons": "Exposes the external boost button registers."
+          "enable_corrections": "Adds the per-sensor temperature offset registers. Each costs an extra Modbus request."
         }
       }
     }
@@ -160,6 +156,13 @@
   },
   "entity": {
     "select": {
+      "external_button_mode": {
+        "name": "External button {slot} mode",
+        "state": {
+          "boost": "Boost",
+          "kitchen_hood": "Kitchen hood"
+        }
+      },
       "ventilation_mode": {
         "name": "Ventilation",
         "state": {

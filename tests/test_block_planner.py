@@ -168,19 +168,16 @@ class TestTiering:
         assert len(covering) == 1
         assert covering[0].count == 55
 
-    def test_opt_in_groups_can_be_excluded(self):
+    def test_the_opt_in_corrections_can_be_excluded(self):
         lean = plan_blocks(
-            tuple(
-                reg for reg in REGISTERS
-                if not reg.key.startswith(("ext_sensor_", "ext_button_"))
-                and not reg.key.endswith("_temp_correction")
-            )
+            tuple(reg for reg in REGISTERS if not reg.key.endswith("_temp_correction"))
         )
         addresses = {b.address for b in lean if b.table is Table.HOLDING}
-        # The external sensor and button blocks live at 300-473; the service
-        # registers at 900 and above are a separate group and stay.
-        assert not any(300 <= address <= 473 for address in addresses)
-        assert 900 in addresses
+        # The corrections live at holding 100-197. The external sensor and button
+        # slots at 300-473 are always read, one request per slot.
+        assert not any(100 <= address <= 197 for address in addresses)
+        assert {300 + 10 * n for n in range(8)} <= addresses
+        assert {400 + 10 * n for n in range(8)} <= addresses
         assert len(lean) < len(plan_blocks())
 
 

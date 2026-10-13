@@ -23,6 +23,32 @@ and ships a set of Lovelace cards, one of which reproduces the mobile app's layo
 - **Only what your unit has.** Peripherals are discovered from the presence
   bitfields, so a unit with five wall sensors gets five sets of entities, not
   twenty-four placeholders.
+- **External sensors and buttons** — the eight sensor and eight button slots
+  another system can write into the unit (holding 300–375 and 400–473). All
+  sixteen are read on every slow poll. A slot in use gets its own entities, and
+  diagnostic counts show how many slots of each kind are in use, alongside the
+  boost buttons wired to the unit's bus.
+
+### External sensors and buttons
+
+These are not devices on the unit's bus. They are slots that a third party — a
+building controller, or Home Assistant itself — fills in, and the unit then uses
+them like its own: an external sensor's readings feed the automatic mode, and an
+external button starts a boost or the kitchen-hood function. Each slot declares
+itself in use in its first register.
+
+| Slot in use | Entities |
+| --- | --- |
+| External sensor *n* | Temperature, humidity, CO₂ and floor temperature sensors. A value the feeding system marks invalid shows as unknown, not as the 0 the register holds. The readings count towards the indoor averages and the highest-CO₂ figure, like any other room sensor |
+| External button *n* | Mode (boost or kitchen hood), timer (0–10800 s), and an active switch. The unit limits activation to three hours |
+
+`sensor.…_external_sensors` and `sensor.…_external_buttons` show how many slots
+are in use, and which. `sensor.…_boost_buttons` does the same for the boost
+buttons wired to the bus, which the map reports only by presence.
+
+To feed a slot from Home Assistant, call `set_external_sensor` — it marks the
+slot in use and its entities appear immediately. A slot can also be claimed by
+hand through its *present* switch, which is disabled by default.
 
 ## Install
 
@@ -106,9 +132,8 @@ is configured.
 **Settings → Devices & services → Jablotron Futura → Configure**
 
 - **Poll interval** (default 15 s) and **configuration poll interval** (default 60 s).
-- **Sensor temperature offsets**, **external sensor registers** and **external
-  button registers** — off by default. Each is strided across the register map, so
-  enabling one adds Modbus requests to every slow poll.
+- **Sensor temperature offsets** — off by default. The offsets are strided across
+  the register map, so enabling them adds Modbus requests to every slow poll.
 
 ## How it talks to the unit
 
@@ -152,7 +177,9 @@ register. Getting the first one backwards — as every earlier community integra
 did — silently shifts every status bit by 16 places.
 
 On a unit with one ALFA controller and five wall sensors, a full live poll is six
-Modbus requests.
+Modbus requests. The external slots add sixteen requests to each slow poll, once
+a minute by default: they are strided too, and every slot has to be read to learn
+whether it is in use.
 
 ## Design tokens
 
@@ -251,9 +278,9 @@ back: all four match to the digit.
   the work.
 - **Registers at 900 and above stay locked** on consumer firmware. Roughly 30% of
   the parameters a service technician sees reach Modbus TCP.
-- **External sensor and button registers** are documented and readable, and writes
-  are accepted, but the community has reported them being ignored by the unit.
-  They are opt-in for that reason.
+- **Whether the unit acts on external slots written over Modbus TCP is not yet
+  confirmed.** The registers read back and accept writes, but community reports
+  say the unit ignored them. The entities show what each slot holds either way.
 - Requires firmware **FUA.P.05.00** or newer; the integration warns if the unit
   reports less.
 
