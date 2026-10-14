@@ -24,6 +24,13 @@ def auto_enable_custom_integrations(enable_custom_integrations):
     yield
 
 
+@pytest.fixture(autouse=True)
+def no_reconnect_delay(monkeypatch):
+    monkeypatch.setattr(
+        "custom_components.jablotron_futura_modbus.modbus_client.RECONNECT_DELAY", 0
+    )
+
+
 def _composite_starts() -> dict[Table, set[int]]:
     """Addresses that begin a multi-register value, and the words they span."""
     return {
@@ -75,6 +82,12 @@ class FakeFutura:
         #: Which reads go unanswered, by table and start address. The unit stays
         #: connected; pymodbus gives up waiting, as it does for a busy unit.
         self.silent: Callable[[Table, int], bool] = lambda *_: False
+        #: Requests that lose the connection under them, by table and start
+        #: address, as when another client connects: the unit keeps only its
+        #: newest connection and resets the rest.
+        self.taken: Callable[[Table, int], bool] = lambda *_: False
+        #: Connections reset as they open, before pymodbus hands them over.
+        self.taken_on_connect = 0
         self._composites = _composite_starts()
         self._store: dict[Table, dict[int, int]] = {
             Table.INPUT: {},
@@ -127,6 +140,11 @@ class FakeFutura:
             raise ModbusIOException(
                 "No response received after 1 retries, continue with next request"
             )
+        if self.taken(table, address):
+            self.connected = False
+            raise ModbusIOException(
+                "No response received after 1 retries, continue with next request"
+            )
         error = self._check(table, address, count)
         if error is not None:
             return error
@@ -138,6 +156,9 @@ class FakeFutura:
     async def connect(self) -> bool:
         self.connected = True
         self.connects += 1
+        if self.taken_on_connect:
+            self.taken_on_connect -= 1
+            self.connected = False
         return True
 
     def close(self) -> None:

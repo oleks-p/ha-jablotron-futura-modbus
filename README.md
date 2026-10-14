@@ -143,8 +143,14 @@ regression test.
 
 **One socket, unit ID 1 only.** The unit accepts a single TCP connection, so every
 read and write is serialised behind one lock. Addressing any unit ID other than 1
-on a live socket makes it *drop the connection*, so the unit ID is pinned. If
-something else on your network polls the unit, the two will fight over the socket.
+on a live socket makes it *drop the connection*, so the unit ID is pinned.
+
+If something else on your network polls the unit, the two take turns: the unit
+keeps only its newest connection and resets the other. A request that loses its
+connection that way is sent again on a new one, which almost always gets through.
+The other client's connection is reset in the same way each time Home Assistant
+connects, so it has to cope too. Best of all, have only one thing poll the unit.
+
 A request the unit leaves unanswered is not a lost connection, though: it answers
 the next one as usual. A block that gets no reply keeps its last reading for that
 poll, and only three unanswered requests in a row close the socket.

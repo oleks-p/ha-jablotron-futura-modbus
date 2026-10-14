@@ -15,7 +15,9 @@ from __future__ import annotations
 import asyncio
 import inspect
 import logging
-from typing import Final, NoReturn
+from collections.abc import Awaitable, Callable
+from operator import methodcaller
+from typing import Any, Final, NoReturn
 
 from pymodbus.client import AsyncModbusTcpClient
 from pymodbus.exceptions import ModbusIOException
@@ -43,6 +45,13 @@ RETRIES: Final = 1
 #: dead. One silence is the unit busy, not gone; see `_no_reply`.
 MAX_SILENT_REQUESTS: Final = 3
 
+#: The unit keeps only its newest connection, so another client connecting
+#: resets ours. A request that loses its connection that way is sent again on a
+#: new one this many times, after a pause that lets the other client finish the
+#: request it connected for.
+RECONNECTS: Final = 1
+RECONNECT_DELAY: Final = 0.5
+
 
 class FuturaConnectionError(Exception):
     """The unit could not be reached, or dropped the connection."""
@@ -54,6 +63,10 @@ class FuturaTimeoutError(FuturaConnectionError):
 
 class FuturaModbusError(Exception):
     """The unit answered with a Modbus exception."""
+
+
+class _ConnectionTaken(Exception):
+    """The unit reset our connection, as it does when another client connects."""
 
 
 class FuturaClient:
@@ -104,7 +117,7 @@ class FuturaClient:
             return self._client
 
         try:
-            await self._client.connect()
+            accepted = await self._client.connect()
         except Exception as err:  # pymodbus raises a wide range here
             await self._drop()
             raise FuturaConnectionError(
@@ -113,6 +126,10 @@ class FuturaClient:
 
         if not getattr(self._client, "connected", False):
             await self._drop()
+            if accepted:
+                # pymodbus waits a moment after connecting, and the unit reset
+                # the connection within it: another client connected just after.
+                raise _ConnectionTaken("the unit reset the connection as it opened")
             raise FuturaConnectionError(f"cannot connect to {self._host}:{self._port}")
 
         _LOGGER.debug("Connected to Futura at %s:%s", self._host, self._port)
@@ -150,17 +167,21 @@ class FuturaClient:
         a dead socket: the unit was busy, and it answers the next request as
         usual. Dropping the socket for it took every entity unavailable for a
         whole scan interval over one late block. So the socket stays up, and only
-        a run of silences, or pymodbus closing the transport itself, counts as
-        the connection having gone.
+        a run of silences counts as the connection having gone.
+
+        pymodbus raises the same exception when the connection was reset under
+        the request, after waiting out the timeout for an answer that could
+        never come. That is another client taking the socket, not a silence.
         """
         if isinstance(err.__cause__, asyncio.CancelledError):
             # pymodbus wraps a cancelled request in the same exception. The unit
             # did not go quiet, and the cancelled task still has to stop.
             raise err.__cause__
+        if not getattr(client, "connected", False):
+            await self._drop()
+            raise _ConnectionTaken("the unit reset the connection") from err
         self._silent += 1
-        if self._silent >= MAX_SILENT_REQUESTS or not getattr(
-            client, "connected", False
-        ):
+        if self._silent >= MAX_SILENT_REQUESTS:
             await self._drop()
             raise FuturaConnectionError(f"{what} failed: {err}") from err
         raise FuturaTimeoutError(f"{what}: no reply: {err}") from err
@@ -171,48 +192,72 @@ class FuturaClient:
         self._backoff = min(self._backoff * 2, BACKOFF_MAX)
         return delay
 
+    async def _request(
+        self, what: str, send: Callable[[AsyncModbusTcpClient], Awaitable[Any]]
+    ) -> Any:
+        """Send one request, and again on a new connection if ours was taken.
+
+        Another client connecting resets our connection, and a request caught
+        by that failed the whole poll, about one in twelve where something else
+        polls the unit every few seconds. That client's next connection is
+        seconds away, so the request almost always gets through on a second
+        connection. Every request here sets registers to absolute values, so
+        sending a write again cannot apply it twice.
+        """
+        async with self._lock:
+            for attempt in range(RECONNECTS + 1):
+                if attempt:
+                    await asyncio.sleep(RECONNECT_DELAY)
+                try:
+                    return await self._attempt(what, send)
+                except _ConnectionTaken as err:
+                    _LOGGER.debug("%s: %s", what, err)
+                    taken = err
+            raise FuturaConnectionError(
+                f"{what} failed: {taken}, another client is using the unit"
+            ) from taken
+
+    async def _attempt(
+        self, what: str, send: Callable[[AsyncModbusTcpClient], Awaitable[Any]]
+    ) -> Any:
+        client = await self._ensure_connected()
+        try:
+            result = await send(client)
+        except ModbusIOException as err:
+            await self._no_reply(client, what, err)
+        except Exception as err:
+            await self._drop()
+            raise FuturaConnectionError(f"{what} failed: {err}") from err
+
+        self._silent = 0
+        if result.isError():
+            # A Modbus exception means a bad address, not a bad socket, so
+            # the connection stays up.
+            raise FuturaModbusError(f"{what}: {result}")
+        return result
+
     async def read(self, table: str, address: int, count: int) -> list[int]:
         """Read `count` registers from the input or holding table."""
-        async with self._lock:
-            client = await self._ensure_connected()
-            kwargs = {"count": count, self._resolve_unit_kwarg(): self._unit_id}
-            what = f"read {table}[{address}..{address + count - 1}]"
-            try:
-                if table == "input":
-                    result = await client.read_input_registers(address, **kwargs)
-                else:
-                    result = await client.read_holding_registers(address, **kwargs)
-            except ModbusIOException as err:
-                await self._no_reply(client, what, err)
-            except Exception as err:
-                await self._drop()
-                raise FuturaConnectionError(f"{what} failed: {err}") from err
-
-            self._silent = 0
-            if result.isError():
-                # A Modbus exception means a bad address, not a bad socket, so
-                # the connection stays up.
-                raise FuturaModbusError(f"{what}: {result}")
-            return list(result.registers)
+        method = "read_input_registers" if table == "input" else "read_holding_registers"
+        result = await self._request(
+            f"read {table}[{address}..{address + count - 1}]",
+            methodcaller(
+                method, address, count=count, **{self._resolve_unit_kwarg(): self._unit_id}
+            ),
+        )
+        return list(result.registers)
 
     async def write_single(self, address: int, value: int) -> None:
         """Write one holding register (FC6)."""
-        async with self._lock:
-            client = await self._ensure_connected()
-            kwargs = {self._resolve_unit_kwarg(): self._unit_id}
-            what = f"write holding[{address}]"
-            try:
-                result = await client.write_register(
-                    address, value=value & 0xFFFF, **kwargs
-                )
-            except ModbusIOException as err:
-                await self._no_reply(client, what, err)
-            except Exception as err:
-                await self._drop()
-                raise FuturaConnectionError(f"{what} failed: {err}") from err
-            self._silent = 0
-            if result.isError():
-                raise FuturaModbusError(f"{what}: {result}")
+        await self._request(
+            f"write holding[{address}]",
+            methodcaller(
+                "write_register",
+                address,
+                value=value & 0xFFFF,
+                **{self._resolve_unit_kwarg(): self._unit_id},
+            ),
+        )
 
     async def write_multiple(self, address: int, values: list[int]) -> None:
         """Write consecutive holding registers (FC16).
@@ -220,20 +265,13 @@ class FuturaClient:
         Composite values must go out in one FC16 request; writing half of a
         uint32 with FC6 is rejected with ILLEGAL_DATA_ADDRESS.
         """
-        async with self._lock:
-            client = await self._ensure_connected()
-            kwargs = {self._resolve_unit_kwarg(): self._unit_id}
-            payload = [v & 0xFFFF for v in values]
-            what = f"write holding[{address}..{address + len(payload) - 1}]"
-            try:
-                result = await client.write_registers(
-                    address, values=payload, **kwargs
-                )
-            except ModbusIOException as err:
-                await self._no_reply(client, what, err)
-            except Exception as err:
-                await self._drop()
-                raise FuturaConnectionError(f"{what} failed: {err}") from err
-            self._silent = 0
-            if result.isError():
-                raise FuturaModbusError(f"{what}: {result}")
+        payload = [v & 0xFFFF for v in values]
+        await self._request(
+            f"write holding[{address}..{address + len(payload) - 1}]",
+            methodcaller(
+                "write_registers",
+                address,
+                values=payload,
+                **{self._resolve_unit_kwarg(): self._unit_id},
+            ),
+        )
