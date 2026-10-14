@@ -98,6 +98,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except FuturaConnectionError as err:
         await client.async_close()
         raise ConfigEntryNotReady(str(err)) from err
+    except ConfigEntryNotReady:
+        # A timeout leaves the socket up, and the retry builds a new client
+        # that needs the unit's one socket free.
+        await client.async_close()
+        raise
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 

@@ -15,10 +15,10 @@ from __future__ import annotations
 import asyncio
 import inspect
 import logging
-from typing import Final
+from typing import Final, NoReturn
 
 from pymodbus.client import AsyncModbusTcpClient
-from pymodbus.exceptions import ModbusException
+from pymodbus.exceptions import ModbusIOException
 
 from .const import SUPPORTED_UNIT_ID
 
@@ -39,9 +39,17 @@ NO_AUTO_RECONNECT: Final = 0
 #: three internal retries at the connect timeout would stall each poll for ages.
 RETRIES: Final = 1
 
+#: Requests in a row the unit may leave unanswered before the socket counts as
+#: dead. One silence is the unit busy, not gone; see `_no_reply`.
+MAX_SILENT_REQUESTS: Final = 3
+
 
 class FuturaConnectionError(Exception):
     """The unit could not be reached, or dropped the connection."""
+
+
+class FuturaTimeoutError(FuturaConnectionError):
+    """The unit left one request unanswered; the connection is still up."""
 
 
 class FuturaModbusError(Exception):
@@ -65,6 +73,7 @@ class FuturaClient:
         self._client: AsyncModbusTcpClient | None = None
         self._lock = asyncio.Lock()
         self._backoff = BACKOFF_START
+        self._silent = 0
         self._unit_kwarg: str | None = None
 
     @property
@@ -108,6 +117,7 @@ class FuturaClient:
 
         _LOGGER.debug("Connected to Futura at %s:%s", self._host, self._port)
         self._backoff = BACKOFF_START
+        self._silent = 0
         return self._client
 
     async def _drop(self) -> None:
@@ -131,6 +141,30 @@ class FuturaClient:
         async with self._lock:
             await self._drop()
 
+    async def _no_reply(
+        self, client: AsyncModbusTcpClient, what: str, err: ModbusIOException
+    ) -> NoReturn:
+        """Classify a request the unit did not answer.
+
+        pymodbus reports a timeout as a ModbusIOException, but a timeout is not
+        a dead socket: the unit was busy, and it answers the next request as
+        usual. Dropping the socket for it took every entity unavailable for a
+        whole scan interval over one late block. So the socket stays up, and only
+        a run of silences, or pymodbus closing the transport itself, counts as
+        the connection having gone.
+        """
+        if isinstance(err.__cause__, asyncio.CancelledError):
+            # pymodbus wraps a cancelled request in the same exception. The unit
+            # did not go quiet, and the cancelled task still has to stop.
+            raise err.__cause__
+        self._silent += 1
+        if self._silent >= MAX_SILENT_REQUESTS or not getattr(
+            client, "connected", False
+        ):
+            await self._drop()
+            raise FuturaConnectionError(f"{what} failed: {err}") from err
+        raise FuturaTimeoutError(f"{what}: no reply: {err}") from err
+
     def next_backoff(self) -> float:
         """Delay to wait before the next reconnect attempt."""
         delay = self._backoff
@@ -142,28 +176,23 @@ class FuturaClient:
         async with self._lock:
             client = await self._ensure_connected()
             kwargs = {"count": count, self._resolve_unit_kwarg(): self._unit_id}
+            what = f"read {table}[{address}..{address + count - 1}]"
             try:
                 if table == "input":
                     result = await client.read_input_registers(address, **kwargs)
                 else:
                     result = await client.read_holding_registers(address, **kwargs)
-            except ModbusException as err:
-                await self._drop()
-                raise FuturaConnectionError(
-                    f"read {table}[{address}..{address + count - 1}] failed: {err}"
-                ) from err
+            except ModbusIOException as err:
+                await self._no_reply(client, what, err)
             except Exception as err:
                 await self._drop()
-                raise FuturaConnectionError(
-                    f"read {table}[{address}..{address + count - 1}] failed: {err}"
-                ) from err
+                raise FuturaConnectionError(f"{what} failed: {err}") from err
 
+            self._silent = 0
             if result.isError():
                 # A Modbus exception means a bad address, not a bad socket, so
                 # the connection stays up.
-                raise FuturaModbusError(
-                    f"read {table}[{address}..{address + count - 1}]: {result}"
-                )
+                raise FuturaModbusError(f"{what}: {result}")
             return list(result.registers)
 
     async def write_single(self, address: int, value: int) -> None:
@@ -171,17 +200,19 @@ class FuturaClient:
         async with self._lock:
             client = await self._ensure_connected()
             kwargs = {self._resolve_unit_kwarg(): self._unit_id}
+            what = f"write holding[{address}]"
             try:
                 result = await client.write_register(
                     address, value=value & 0xFFFF, **kwargs
                 )
+            except ModbusIOException as err:
+                await self._no_reply(client, what, err)
             except Exception as err:
                 await self._drop()
-                raise FuturaConnectionError(
-                    f"write holding[{address}] failed: {err}"
-                ) from err
+                raise FuturaConnectionError(f"{what} failed: {err}") from err
+            self._silent = 0
             if result.isError():
-                raise FuturaModbusError(f"write holding[{address}]: {result}")
+                raise FuturaModbusError(f"{what}: {result}")
 
     async def write_multiple(self, address: int, values: list[int]) -> None:
         """Write consecutive holding registers (FC16).
@@ -193,17 +224,16 @@ class FuturaClient:
             client = await self._ensure_connected()
             kwargs = {self._resolve_unit_kwarg(): self._unit_id}
             payload = [v & 0xFFFF for v in values]
+            what = f"write holding[{address}..{address + len(payload) - 1}]"
             try:
                 result = await client.write_registers(
                     address, values=payload, **kwargs
                 )
+            except ModbusIOException as err:
+                await self._no_reply(client, what, err)
             except Exception as err:
                 await self._drop()
-                raise FuturaConnectionError(
-                    f"write holding[{address}..{address + len(payload) - 1}] "
-                    f"failed: {err}"
-                ) from err
+                raise FuturaConnectionError(f"{what} failed: {err}") from err
+            self._silent = 0
             if result.isError():
-                raise FuturaModbusError(
-                    f"write holding[{address}..{address + len(payload) - 1}]: {result}"
-                )
+                raise FuturaModbusError(f"{what}: {result}")

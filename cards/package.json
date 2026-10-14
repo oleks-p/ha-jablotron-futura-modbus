@@ -1,6 +1,6 @@
 {
   "name": "futura-cards",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Lovelace cards for the Jablotron Futura Modbus integration",
   "license": "MIT",

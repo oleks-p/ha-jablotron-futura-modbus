@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
+from pymodbus.exceptions import ModbusIOException
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.jablotron_futura_modbus.const import CONF_UNIT_ID, DOMAIN
@@ -66,9 +68,13 @@ class FakeFutura:
 
     def __init__(self, observed: dict) -> None:
         self.connected = False
+        self.connects = 0
         self.writes: list[tuple[int, list[int]]] = []
         #: Counts read requests, so tests can assert refreshes are coalesced.
         self.reads = 0
+        #: Which reads go unanswered, by table and start address. The unit stays
+        #: connected; pymodbus gives up waiting, as it does for a busy unit.
+        self.silent: Callable[[Table, int], bool] = lambda *_: False
         self._composites = _composite_starts()
         self._store: dict[Table, dict[int, int]] = {
             Table.INPUT: {},
@@ -117,6 +123,10 @@ class FakeFutura:
         if not self.connected:
             raise ConnectionError("not connected")
         self.reads += 1
+        if self.silent(table, address):
+            raise ModbusIOException(
+                "No response received after 1 retries, continue with next request"
+            )
         error = self._check(table, address, count)
         if error is not None:
             return error
@@ -127,6 +137,7 @@ class FakeFutura:
 
     async def connect(self) -> bool:
         self.connected = True
+        self.connects += 1
         return True
 
     def close(self) -> None:

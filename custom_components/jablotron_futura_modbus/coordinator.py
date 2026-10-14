@@ -27,7 +27,12 @@ from .const import (
     NTC_DISCONNECTED_RAW,
     WRITE_REFRESH_COOLDOWN,
 )
-from .modbus_client import FuturaClient, FuturaConnectionError, FuturaModbusError
+from .modbus_client import (
+    FuturaClient,
+    FuturaConnectionError,
+    FuturaModbusError,
+    FuturaTimeoutError,
+)
 from .registers import (
     BY_KEY,
     CONFIG_BITS,
@@ -167,6 +172,7 @@ class FuturaCoordinator(DataUpdateCoordinator[FuturaData]):
         self._last_slow: float = 0.0
         self._cache: dict[str, list[int]] = {}
         self._stale: list[str] = []
+        self._primed = False
         self.data = FuturaData()
 
     @staticmethod
@@ -226,16 +232,27 @@ class FuturaCoordinator(DataUpdateCoordinator[FuturaData]):
         if include_slow:
             self._last_slow = now
 
+        self._primed = True
         self._check_firmware(data)
         return data
 
     async def _fetch(self, block: Block) -> None:
-        """Read one block into the cache, keeping prior words on a rejection."""
+        """Read one block into the cache, keeping prior words if it fails."""
         key = self._cache_key(block)
         try:
             words = await self.client.read(
                 block.table.value, block.address, block.count
             )
+        except FuturaTimeoutError as err:
+            # The unit was busy and the socket is fine, so one late block
+            # must not take every entity unavailable: it keeps its last
+            # reading until the next poll. The first poll has none to keep,
+            # and setup should retry rather than start with holes in it.
+            if not self._primed:
+                raise UpdateFailed(str(err)) from err
+            _LOGGER.debug("Keeping the last reading of %s: %s", block, err)
+            self._stale.append(str(block))
+            return
         except FuturaConnectionError as err:
             raise UpdateFailed(str(err)) from err
         except FuturaModbusError as err:

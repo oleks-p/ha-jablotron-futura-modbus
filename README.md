@@ -145,6 +145,9 @@ regression test.
 read and write is serialised behind one lock. Addressing any unit ID other than 1
 on a live socket makes it *drop the connection*, so the unit ID is pinned. If
 something else on your network polls the unit, the two will fight over the socket.
+A request the unit leaves unanswered is not a lost connection, though: it answers
+the next one as usual. A block that gets no reply keeps its last reading for that
+poll, and only three unanswered requests in a row close the socket.
 
 **Composite values are atomic.** A read that starts or ends inside a `uint32` is
 rejected with `ILLEGAL_DATA_ADDRESS`, as is any read spanning an undefined address.
