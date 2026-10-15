@@ -1,6 +1,6 @@
 """The simulator must behave like the capture says the unit behaves.
 
-Driven from `registers_observed.json` rather than from a list written here, so
+Driven from the committed capture rather than from a list written here, so
 the simulator cannot drift from the thing it stands in for: a block the probe
 recorded as answered must be answered, and one it recorded as refused must be
 refused, whatever is added to the capture later.
@@ -18,9 +18,12 @@ import pytest
 
 from tools.sim_futura import Server, Unit
 
+#: The committed fixture, not `registers_observed.json` - that one is
+#: gitignored local probe output, so a test reading it passes here and fails
+#: in CI with FileNotFoundError, which is exactly what happened.
 CAPTURE = json.loads(
-    (pathlib.Path(__file__).resolve().parent.parent / "registers_observed.json")
-    .read_text()
+    (pathlib.Path(__file__).resolve().parent / "fixtures"
+     / "futura_l_fua_p_07_20.json").read_text()
 )
 
 READ_HOLDING, READ_INPUT = 3, 4

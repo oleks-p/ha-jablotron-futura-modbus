@@ -3,7 +3,7 @@
 
 Serve the reference unit's capture, no hardware:
 
-    python3 tools/sim_futura.py --capture registers_observed.json --listen 0.0.0.0:5020
+    python3 tools/sim_futura.py --listen 0.0.0.0:5020
 
 then add the integration with host = this machine, port 5020, unit id 1.
 
@@ -244,7 +244,8 @@ class Handler(socketserver.BaseRequestHandler):
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--capture", default="registers_observed.json",
+    ap.add_argument("--capture",
+                    default="tests/fixtures/futura_l_fua_p_07_20.json",
                     help="the probe capture to serve")
     ap.add_argument("--listen", default="0.0.0.0:5020", help="host:port")
     ap.add_argument("--sockets", type=int, default=1,

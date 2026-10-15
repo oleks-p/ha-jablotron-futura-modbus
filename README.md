@@ -72,7 +72,7 @@ directory and restart Home Assistant.
 TCP, so the integration can be installed and exercised with no hardware:
 
 ```sh
-python3 tools/sim_futura.py --capture registers_observed.json --listen 0.0.0.0:5020
+python3 tools/sim_futura.py --listen 0.0.0.0:5020
 ```
 
 then add the integration with host = that machine, port 5020, unit id 1. Or
@@ -93,6 +93,12 @@ It reproduces the three behaviours that are worth testing against:
 `tests/test_sim.py` drives all of it from the capture rather than from a list
 written by hand, so a block recorded as answered must be answered and one
 recorded as refused must be refused.
+
+The capture it serves is `tests/fixtures/futura_l_fua_p_07_20.json`, produced
+from a probe run by `tools/make_sim_fixture.py`, which strips the unit's
+address and MAC - including the three INPUT registers the MAC is read from, not
+just the decoded field. `registers_observed.json` itself stays gitignored: it is
+output from one unit on one network.
 
 ## Dashboard
 

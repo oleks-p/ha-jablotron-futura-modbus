@@ -17,7 +17,8 @@ services:
     image: python:3.13-slim
     working_dir: /repo
     command: >-
-      python3 -u tools/sim_futura.py --capture registers_observed.json
+      python3 -u tools/sim_futura.py
+      --capture tests/fixtures/futura_l_fua_p_07_20.json
       --listen 0.0.0.0:5020
     volumes:
       - .:/repo:ro
