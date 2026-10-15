@@ -1,10 +1,27 @@
-# Development Home Assistant instance.
+# A dev Home Assistant against a simulated Futura -- no hardware needed.
 #
-#   docker compose up
-#   open http://localhost:8123
+#   docker compose up -d
+#   open http://localhost:8123, onboard, then add "Jablotron Futura":
+#   host "sim", port 5020, unit id 1.
+#
+# The simulator serves the reference unit's own probe capture: every block it
+# answered, and every read it REFUSED, including the ones that cross a gap in
+# the register map. Pointing a dev instance at the real unit is not an
+# alternative - it has one Modbus socket, so a second client evicts whatever is
+# already there, which in practice means taking a household's ventilation off
+# its controller to run a test.
 #
 # The integration is mounted read-write so edits are picked up on restart.
 services:
+  sim:
+    image: python:3.13-slim
+    working_dir: /repo
+    command: >-
+      python3 -u tools/sim_futura.py --capture registers_observed.json
+      --listen 0.0.0.0:5020
+    volumes:
+      - .:/repo:ro
+
   homeassistant:
     container_name: futura-dev
     image: ghcr.io/home-assistant/home-assistant:stable
@@ -14,3 +31,5 @@ services:
     ports:
       - "8123:8123"
     restart: unless-stopped
+    depends_on:
+      - sim

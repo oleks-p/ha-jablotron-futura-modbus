@@ -66,6 +66,34 @@ hand through its *present* switch, which is disabled by default.
 Copy `custom_components/jablotron_futura_modbus` into your `config/custom_components`
 directory and restart Home Assistant.
 
+## Testing without the unit
+
+`tools/sim_futura.py` serves the reference unit's probe capture over Modbus
+TCP, so the integration can be installed and exercised with no hardware:
+
+```sh
+python3 tools/sim_futura.py --capture registers_observed.json --listen 0.0.0.0:5020
+```
+
+then add the integration with host = that machine, port 5020, unit id 1. Or
+`docker compose up -d`, which runs both.
+
+It reproduces the three behaviours that are worth testing against:
+
+- **One socket.** A second client takes it over and the first stops being
+  answered, with its socket still open - so the symptom is a timeout, not a
+  disconnection. This is what makes pointing a dev instance at the real unit a
+  bad idea: it evicts whatever is already talking to it.
+- **Reads that span a gap are refused** whole, with ILLEGAL_DATA_ADDRESS. The
+  map has holes at holding 18-19, input 22-29 and input 39, and the block sizes
+  this integration reads exist because of them.
+- **Silence on demand** (`--drop-every N`), which is the failure the reconnect
+  path handles and the one that cannot be arranged on real hardware.
+
+`tests/test_sim.py` drives all of it from the capture rather than from a list
+written by hand, so a block recorded as answered must be answered and one
+recorded as refused must be refused.
+
 ## Dashboard
 
 Copy [`dashboards/futura.yaml`](dashboards/futura.yaml) into a new dashboard via
