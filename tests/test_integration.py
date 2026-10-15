@@ -1193,3 +1193,38 @@ async def test_the_schematic_picker_survives_the_bus_going_quiet(
     ), "the harness did not actually take the bus down"
     state = hass.states.get("select.jablotron_futura_schematic")
     assert state.state == "flow", "the picker went unavailable with the bus"
+
+
+async def test_the_schematic_picker_id_does_not_depend_on_the_area(
+    hass: HomeAssistant, setup_integration
+):
+    """Its entity_id is derived from the device name and nothing else.
+
+    Every other entity here predates the current naming rule and keeps its id
+    through the registry, so they are all `<device name>_<key>`. A new entity
+    follows whatever Home Assistant does today, and today that can fold in the
+    device's AREA: filed under Гараж, this arrived as
+    `select.garazh_jablotron_futura_schematic` - the only one of 185 that did
+    not match the documented `jablotron_futura` prefix, which made the shipped
+    dashboard point at an entity that did not exist.
+
+    Asserted on the entity itself rather than through a placement, because the
+    id has to be decided before the entity is added - that is the only point at
+    which Home Assistant will take it.
+    """
+    from custom_components.jablotron_futura_modbus.select import (
+        SCHEMATIC_DESCRIPTION,
+        FuturaSchematicSelect,
+    )
+
+    entry = hass.config_entries.async_entries("jablotron_futura_modbus")[0]
+    coordinator = hass.data["jablotron_futura_modbus"][entry.entry_id]
+    built = FuturaSchematicSelect(coordinator, SCHEMATIC_DESCRIPTION)
+    assert built.entity_id == "select.jablotron_futura_schematic"
+
+    # and a differently named unit follows its own name, not a hardcoded one
+    coordinator.device_name = "Futura 2"
+    assert (
+        FuturaSchematicSelect(coordinator, SCHEMATIC_DESCRIPTION).entity_id
+        == "select.futura_2_schematic"
+    )

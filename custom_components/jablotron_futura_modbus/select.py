@@ -10,6 +10,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.util import slugify
 
 from .const import DOMAIN, HUMIDITY_PRESETS, MODE_AUTO, MODE_OFF
 from .coordinator import FuturaCoordinator
@@ -179,6 +180,23 @@ class FuturaSchematicSelect(FuturaEntity, SelectEntity, RestoreEntity):
     def __init__(self, coordinator: FuturaCoordinator, description) -> None:
         super().__init__(coordinator, description)
         self._option = DEFAULT_SCHEMATIC
+        # Pin the object id instead of letting it be derived.
+        #
+        # Every other entity here was created under an older naming rule and
+        # keeps its id through the registry, so they are all
+        # `<device name>_<key>`. A NEW entity follows whatever Home Assistant
+        # does today, and today that can fold in the device's AREA: on a unit
+        # filed under Гараж this arrived as
+        # `select.garazh_jablotron_futura_schematic` - the only one of 185 that
+        # did not match the documented `jablotron_futura` prefix, and therefore
+        # one the shipped dashboard pointed at and could not find.
+        #
+        # Home Assistant honours an entity that sets its own entity_id before
+        # being added, so the id is stated here and is the same on every
+        # installation with the same device name.
+        self.entity_id = (
+            f"select.{slugify(coordinator.device_name)}_{description.key}"
+        )
 
     @property
     def available(self) -> bool:
