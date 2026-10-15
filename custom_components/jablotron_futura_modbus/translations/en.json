@@ -163,6 +163,23 @@
           "kitchen_hood": "Kitchen hood"
         }
       },
+      "humidity_mode": {
+        "name": "Humidity mode",
+        "state": {
+          "dry": "Dry",
+          "comfort": "Comfort",
+          "wet": "Wet"
+        }
+      },
+      "schematic": {
+        "name": "Schematic",
+        "state": {
+          "flow": "Air flow",
+          "unit": "Unit schematic",
+          "service": "Service schematic",
+          "diagram": "Airflow diagram"
+        }
+      },
       "ventilation_mode": {
         "name": "Ventilation",
         "state": {
@@ -173,14 +190,6 @@
           "4": "4",
           "5": "5",
           "auto": "Auto"
-        }
-      },
-      "humidity_mode": {
-        "name": "Humidity mode",
-        "state": {
-          "dry": "Dry",
-          "comfort": "Comfort",
-          "wet": "Wet"
         }
       },
       "zone_priority": {

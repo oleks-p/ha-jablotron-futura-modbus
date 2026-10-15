@@ -9,6 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN, HUMIDITY_PRESETS, MODE_AUTO, MODE_OFF
 from .coordinator import FuturaCoordinator
@@ -91,6 +92,31 @@ def external_button_mode(reg: Reg) -> FuturaSelectDescription:
     )
 
 
+#: Which drawing `custom:futura-schematics-card` shows. The options are the
+#: card's own variant KEYS, so the card matches a state against them directly;
+#: the words a person reads come from `translation_key`, which is how every
+#: other select here is labelled too.
+#:
+#: This replaced `dashboards/futura_helpers.yaml`, an `input_select` the user
+#: had to install as a package and restart for. Asking somebody to create a
+#: helper so that this integration's own card can be switched was an install
+#: step that existed only because the integration did not offer the entity -
+#: and it coupled the card to a string a person could edit, which is why the
+#: card still matches option labels case- and space-insensitively.
+SCHEMATIC_OPTIONS = ("flow", "unit", "service", "diagram")
+DEFAULT_SCHEMATIC = "flow"
+
+SCHEMATIC_DESCRIPTION = SelectEntityDescription(
+    key="schematic",
+    translation_key="schematic",
+    icon="mdi:vector-square",
+    # A view preference, not a setting on the unit: filed under config so it
+    # does not sit among the controls that actually change how the unit runs.
+    entity_category=EntityCategory.CONFIG,
+    options=list(SCHEMATIC_OPTIONS),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -98,6 +124,7 @@ async def async_setup_entry(
     async_add_entities(
         FuturaSelect(coordinator, description) for description in DESCRIPTIONS
     )
+    async_add_entities([FuturaSchematicSelect(coordinator, SCHEMATIC_DESCRIPTION)])
     # One per external button slot, once whatever feeds it marks it in use.
     add_present_entities(
         entry,
@@ -131,3 +158,45 @@ class FuturaSelect(FuturaEntity, SelectEntity):
     async def async_select_option(self, option: str) -> None:
         raw = self.entity_description.mapping[option]
         await self.coordinator.async_write(self.entity_description.register, raw)
+
+
+class FuturaSchematicSelect(FuturaEntity, SelectEntity, RestoreEntity):
+    """Which schematic the card draws. Local state, nothing on the bus.
+
+    Deliberately NOT a register. It holds a dashboard preference, so:
+
+    * it is always available. Every other entity here follows the coordinator,
+      because a reading from a unit that is not answering is a lie. This one
+      reads nothing, and taking the picker away the moment the Modbus link
+      blinks would leave the card stuck on whichever drawing was showing.
+    * it restores its last option, so the choice survives a restart. That was
+      the point of the `input_select` this replaces - it carried no `initial:`
+      for exactly this reason.
+    """
+
+    _attr_should_poll = False
+
+    def __init__(self, coordinator: FuturaCoordinator, description) -> None:
+        super().__init__(coordinator, description)
+        self._option = DEFAULT_SCHEMATIC
+
+    @property
+    def available(self) -> bool:
+        return True
+
+    @property
+    def current_option(self) -> str:
+        return self._option
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        last = await self.async_get_last_state()
+        # Only an option this entity still offers: the set could have changed
+        # with the card, and restoring a word it no longer draws would leave
+        # the card reporting an unknown variant at the user.
+        if last is not None and last.state in SCHEMATIC_OPTIONS:
+            self._option = last.state
+
+    async def async_select_option(self, option: str) -> None:
+        self._option = option
+        self.async_write_ha_state()

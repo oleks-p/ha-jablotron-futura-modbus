@@ -27,15 +27,15 @@ views:
       # once, add a second copy of this card with a fixed `variant` and no
       # `variant_entity`.
       #
-      # `variant` stays as the fallback for when the helper is unavailable — at
-      # startup, or if it is never created. Create it from
-      # dashboards/futura_helpers.yaml.
+      # `variant` stays as the fallback for the moment before the select has a
+      # state. The select is the integration's own entity, so there is nothing
+      # to install and nothing to restart for.
       - type: grid
         cards:
           - type: custom:futura-schematics-card
             prefix: sensor.jablotron_futura
             variant: flow
-            variant_entity: input_select.futura_schematic
+            variant_entity: select.jablotron_futura_schematic
 
       # The right-hand column. This is the second section and both columns start
       # empty, so it is the one that reliably lands there — a sections view
@@ -52,7 +52,7 @@ views:
           # The alternative is a bare tile, which fits two columns but costs a tap
           # to open the dialog; four buttons in a row are worth the width.
           - type: tile
-            entity: input_select.futura_schematic
+            entity: select.jablotron_futura_schematic
             name: Schematic
             icon: mdi:vector-square
             features:

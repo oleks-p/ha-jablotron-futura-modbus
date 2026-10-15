@@ -76,7 +76,7 @@ The cards are also available in the "Add card" picker:
 
 | Card | What it shows |
 | --- | --- |
-| `custom:futura-schematics-card` | A picker, not a drawing: shows any one of the four views below. Set `variant` to fix it, or point `variant_entity` at an `input_select` to switch it from the dashboard without editing anything — see `dashboards/futura_helpers.yaml`. The only card here with a GUI editor. Every other option is passed through to the chosen card, so its own options keep working |
+| `custom:futura-schematics-card` | A picker, not a drawing: shows any one of the four views below. Set `variant` to fix it, or point `variant_entity` at a select to switch it from the dashboard without editing anything — the integration provides `select.jablotron_futura_schematic` for exactly this, so there is nothing to install. The only card here with a GUI editor. Every other option is passed through to the chosen card, so its own options keep working |
 | `custom:futura-flow-card` | A close reproduction of the mobile app's air-quality screen: duct columns with the four readings, metallic collars, flow arrows, two glowing ribbons crossing through the exchanger, the air-quality and recovered-power panel, and the filter bar. The leaf/fan toggle switches to the ventilation controls. Flow animation speed tracks measured airflow. |
 | `custom:futura-unit-card` | The same state as a plumbing schematic: the casing drawn from the installation manual's dimensions with its four flanges in the manual's A–D order, a full-bore duct per flange coloured as the flow card colours that reading, a pill of temperature and humidity over each one, and the exchanger as two crossing semicircles inside the casing |
 | `custom:futura-schematic-card` | The service view of the same unit: an arrow per flange showing which way that duct flows, temperature and humidity above each, filter wear on the hatch, both fan outputs and speeds, and the two air streams as square-dotted runs that cross where the exchanger hands one stream to the other. Shares its casing and flange geometry with the unit card. Absolute humidity, volumetric flow, static pressure and the filter service date appear in the app's version of this screen but not here — the unit does not publish them over Modbus |
@@ -109,8 +109,8 @@ ID, where no prefix can find it.
   called) on each card. The cards only ever match entities directly after their
   prefix, so the first unit's cards do not pick up the second unit's sensors.
 - **Dashboard** — copy `dashboards/futura.yaml` and replace `jablotron_futura`
-  with the unit's prefix throughout. Both copies share the
-  `input_select.futura_schematic` helper unless you give the second its own.
+  with the unit's prefix throughout. Each unit has its own
+  `select.<prefix>_schematic`, so the two dashboards no longer share a picker.
 - **Services** — pass `device_id` to pick the unit. With one unit configured it
   can be left out. The control card passes it itself.
 

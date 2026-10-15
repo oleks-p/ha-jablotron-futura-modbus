@@ -49,54 +49,121 @@
       "name": "Set away period",
       "description": "Sets the holiday period. Times are stored on the unit as local wall-clock time.",
       "fields": {
-        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
-        "begin": { "name": "Begins", "description": "Defaults to now." },
-        "end": { "name": "Ends", "description": "Defaults to seven days after the start." }
+        "device_id": {
+          "name": "Device",
+          "description": "Which Futura to target. Needed only when more than one is configured."
+        },
+        "begin": {
+          "name": "Begins",
+          "description": "Defaults to now."
+        },
+        "end": {
+          "name": "Ends",
+          "description": "Defaults to seven days after the start."
+        }
       }
     },
     "clear_away": {
       "name": "Clear away period",
       "description": "Cancels the holiday period.",
       "fields": {
-        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." }
+        "device_id": {
+          "name": "Device",
+          "description": "Which Futura to target. Needed only when more than one is configured."
+        }
       }
     },
     "set_function": {
       "name": "Start a timed function",
       "description": "Runs boost, circulation, overpressure, night or party mode for a given time.",
       "fields": {
-        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
-        "function": { "name": "Function", "description": "Which function to start." },
-        "duration": { "name": "Duration", "description": "Seconds to run for; 0 stops the function. Night and party accept up to 36000 (10 h), the rest up to 7200 (2 h)." }
+        "device_id": {
+          "name": "Device",
+          "description": "Which Futura to target. Needed only when more than one is configured."
+        },
+        "function": {
+          "name": "Function",
+          "description": "Which function to start."
+        },
+        "duration": {
+          "name": "Duration",
+          "description": "Seconds to run for; 0 stops the function. Night and party accept up to 36000 (10 h), the rest up to 7200 (2 h)."
+        }
       }
     },
     "set_external_sensor": {
       "name": "Feed an external sensor",
       "description": "Pushes a Home Assistant reading into one of the Futura's eight external sensor slots so its automatic mode can use it.",
       "fields": {
-        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
-        "index": { "name": "Slot", "description": "External sensor slot, 1 to 8." },
-        "temperature": { "name": "Temperature", "description": "Air temperature to report." },
-        "humidity": { "name": "Humidity", "description": "Relative humidity to report." },
-        "co2": { "name": "CO2", "description": "CO2 concentration to report." },
-        "floor_temperature": { "name": "Floor temperature", "description": "Floor temperature to report." }
+        "device_id": {
+          "name": "Device",
+          "description": "Which Futura to target. Needed only when more than one is configured."
+        },
+        "index": {
+          "name": "Slot",
+          "description": "External sensor slot, 1 to 8."
+        },
+        "temperature": {
+          "name": "Temperature",
+          "description": "Air temperature to report."
+        },
+        "humidity": {
+          "name": "Humidity",
+          "description": "Relative humidity to report."
+        },
+        "co2": {
+          "name": "CO2",
+          "description": "CO2 concentration to report."
+        },
+        "floor_temperature": {
+          "name": "Floor temperature",
+          "description": "Floor temperature to report."
+        }
       }
     },
     "unlock_service": {
       "name": "Unlock service registers",
       "description": "Attempts to unlock the service register range. Consumer firmware normally refuses this.",
       "fields": {
-        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
-        "code": { "name": "Code", "description": "Service access code." }
+        "device_id": {
+          "name": "Device",
+          "description": "Which Futura to target. Needed only when more than one is configured."
+        },
+        "code": {
+          "name": "Code",
+          "description": "Service access code."
+        }
       }
     },
     "write_register": {
       "name": "Write a holding register",
       "description": "Escape hatch for holding registers this integration does not model. Writing an unknown register can misconfigure the unit.",
       "fields": {
-        "device_id": { "name": "Device", "description": "Which Futura to target. Needed only when more than one is configured." },
-        "address": { "name": "Address", "description": "Holding register address." },
-        "value": { "name": "Value", "description": "Raw 16-bit value." }
+        "device_id": {
+          "name": "Device",
+          "description": "Which Futura to target. Needed only when more than one is configured."
+        },
+        "address": {
+          "name": "Address",
+          "description": "Holding register address."
+        },
+        "value": {
+          "name": "Value",
+          "description": "Raw 16-bit value."
+        }
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "schematic": {
+        "name": "Schematic",
+        "state": {
+          "flow": "Air flow",
+          "unit": "Unit schematic",
+          "service": "Service schematic",
+          "diagram": "Airflow diagram"
+        }
       }
     }
   }

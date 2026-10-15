@@ -1140,3 +1140,56 @@ class TestPeripheralsAppearLate:
             await coordinator.async_refresh()
             await hass.async_block_till_done()
         assert len(hass.states.async_entity_ids("sensor")) == before
+
+
+async def test_the_schematic_picker_is_our_own_entity(
+    hass: HomeAssistant, setup_integration
+):
+    """The card's view picker ships with the integration.
+
+    It used to be `dashboards/futura_helpers.yaml`: an `input_select` the user
+    installed as a package and restarted for, so that this integration's own
+    card could be switched. That is an install step that existed only because
+    the integration did not offer the entity.
+
+    The options are the card's variant KEYS, so the card matches a state
+    against them directly instead of against words a person can edit.
+    """
+    state = hass.states.get("select.jablotron_futura_schematic")
+    assert state is not None, "the schematic select was not created"
+    assert state.state == "flow"
+    assert state.attributes["options"] == ["flow", "unit", "service", "diagram"]
+
+    await hass.services.async_call(
+        "select",
+        "select_option",
+        {"entity_id": "select.jablotron_futura_schematic", "option": "service"},
+        blocking=True,
+    )
+    assert hass.states.get("select.jablotron_futura_schematic").state == "service"
+
+
+async def test_the_schematic_picker_survives_the_bus_going_quiet(
+    hass: HomeAssistant, setup_integration
+):
+    """It reads nothing from the unit, so it must not follow the unit.
+
+    Every other entity here follows the coordinator, because a reading from a
+    unit that is not answering is a lie. This one holds a dashboard preference;
+    taking it away the moment the Modbus link blinks would leave the card stuck
+    on whichever drawing happened to be showing, with no way to change it.
+    """
+    entry = hass.config_entries.async_entries("jablotron_futura_modbus")[0]
+    coordinator = hass.data["jablotron_futura_modbus"][entry.entry_id]
+    coordinator.last_update_success = False
+    coordinator.async_update_listeners()
+    await hass.async_block_till_done()
+
+    # The contrast is the test: a register-backed select in the same condition
+    # must go unavailable, or this proves nothing about the picker.
+    assert (
+        hass.states.get("select.jablotron_futura_humidity_mode").state
+        == "unavailable"
+    ), "the harness did not actually take the bus down"
+    state = hass.states.get("select.jablotron_futura_schematic")
+    assert state.state == "flow", "the picker went unavailable with the bus"
