@@ -1,0 +1,977 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "any_error": {
+        "name": "Несправність"
+      },
+      "any_warning": {
+        "name": "Попередження"
+      },
+      "config_bypass": {
+        "name": "Підтримка: байпас"
+      },
+      "config_coolbreeze": {
+        "name": "Підтримка: CoolBreeze"
+      },
+      "config_coolbreeze_cooling": {
+        "name": "Підтримка: охолодження CoolBreeze"
+      },
+      "config_coolbreeze_heating": {
+        "name": "Підтримка: нагрів CoolBreeze"
+      },
+      "config_exchanger_control": {
+        "name": "Підтримка: керування рекуператором"
+      },
+      "config_inner_circulation": {
+        "name": "Підтримка: внутрішня циркуляція"
+      },
+      "config_internal_heating": {
+        "name": "Підтримка: внутрішній нагрів"
+      },
+      "config_variobreeze": {
+        "name": "Підтримка: VarioBreeze"
+      },
+      "error_coolbreeze_communication": {
+        "name": "Помилка: звʼязок із CoolBreeze"
+      },
+      "error_coolbreeze_outdoor_unit": {
+        "name": "Помилка: зовнішній блок CoolBreeze"
+      },
+      "error_exchanger_communication": {
+        "name": "Помилка: звʼязок з рекуператором"
+      },
+      "error_exchanger_damper_position": {
+        "name": "Помилка: положення заслінки рекуператора"
+      },
+      "error_fan_exhaust": {
+        "name": "Помилка: витяжний вентилятор"
+      },
+      "error_fan_exhaust_blocked": {
+        "name": "Помилка: витяжний вентилятор заблоковано"
+      },
+      "error_fan_supply": {
+        "name": "Помилка: припливний вентилятор"
+      },
+      "error_fan_supply_blocked": {
+        "name": "Помилка: припливний вентилятор заблоковано"
+      },
+      "error_io_board_communication": {
+        "name": "Помилка: звʼязок із платою вводу/виводу"
+      },
+      "error_sensor_ambient": {
+        "name": "Помилка: датчик зовнішнього повітря"
+      },
+      "error_sensor_fresh": {
+        "name": "Помилка: датчик припливного повітря"
+      },
+      "error_sensor_indoor": {
+        "name": "Помилка: датчик витяжного повітря"
+      },
+      "error_sensor_waste": {
+        "name": "Помилка: датчик викидного повітря"
+      },
+      "input_boost_input": {
+        "name": "Вхід: Boost"
+      },
+      "input_factory_button": {
+        "name": "Вхід: заводська кнопка"
+      },
+      "input_uin1": {
+        "name": "Вхід: UIN1"
+      },
+      "input_uin2": {
+        "name": "Вхід: UIN2"
+      },
+      "input_user_button": {
+        "name": "Вхід: користувацька кнопка"
+      },
+      "mode_antifreeze_active": {
+        "name": "Захист від замерзання"
+      },
+      "mode_antiradon_active": {
+        "name": "Захист від радону"
+      },
+      "mode_away_active": {
+        "name": "Відпустка"
+      },
+      "mode_boost_active": {
+        "name": "Boost"
+      },
+      "mode_bypass_open": {
+        "name": "Байпас відкритий"
+      },
+      "mode_circulation_active": {
+        "name": "Циркуляція"
+      },
+      "mode_device_on": {
+        "name": "Пристрій увімкнено"
+      },
+      "mode_drying_running": {
+        "name": "Осушення"
+      },
+      "mode_emergency_stop": {
+        "name": "Аварійна зупинка"
+      },
+      "mode_filter_check_running": {
+        "name": "Перевірка фільтра"
+      },
+      "mode_low_outdoor_temp_limit": {
+        "name": "Обмеження за низької зовнішньої температури"
+      },
+      "mode_night_active": {
+        "name": "Нічний режим"
+      },
+      "mode_overpressure_active": {
+        "name": "Надлишковий тиск"
+      },
+      "mode_party_active": {
+        "name": "Вечірка"
+      },
+      "mode_pressure_loss_measurement": {
+        "name": "Вимірювання втрат тиску"
+      },
+      "mode_service_mode": {
+        "name": "Сервісний режим"
+      },
+      "mode_standby": {
+        "name": "Очікування"
+      },
+      "mode_starting_up": {
+        "name": "Запуск"
+      },
+      "mode_stopped_after_error": {
+        "name": "Зупинено через помилку"
+      },
+      "mode_time_program_active": {
+        "name": "Розклад"
+      },
+      "mode_waste_air_below_minus_three": {
+        "name": "Викидне повітря нижче −3 °C"
+      },
+      "mode_zone_boost": {
+        "name": "Boost зони"
+      },
+      "mode_zone_pressure_loss_measurement": {
+        "name": "Вимірювання втрат тиску зон"
+      },
+      "warning_emergency_stop": {
+        "name": "Попередження: аварійна зупинка"
+      },
+      "warning_fan_exhaust_overspeed": {
+        "name": "Попередження: перевищення обертів витяжного вентилятора"
+      },
+      "warning_fan_supply_overspeed": {
+        "name": "Попередження: перевищення обертів припливного вентилятора"
+      },
+      "warning_filter_too_dirty": {
+        "name": "Попередження: фільтр надто забруднений"
+      },
+      "warning_filter_uninitialised": {
+        "name": "Попередження: фільтр не ініціалізовано"
+      },
+      "warning_filter_used_too_long": {
+        "name": "Попередження: фільтр використовується надто довго"
+      },
+      "warning_outdoor_temp_too_low": {
+        "name": "Попередження: надто низька зовнішня температура"
+      },
+      "warning_rtc_battery_low": {
+        "name": "Попередження: низький заряд батареї RTC"
+      },
+      "warning_superbreeze_communication": {
+        "name": "Попередження: звʼязок із SuperBreeze"
+      },
+      "warning_superbreeze_general": {
+        "name": "Попередження: загальна несправність SuperBreeze"
+      },
+      "warning_zone_config_exhaust": {
+        "name": "Попередження: конфігурація зон витяжки"
+      },
+      "warning_zone_config_supply": {
+        "name": "Попередження: конфігурація зон припливу"
+      }
+    },
+    "button": {
+      "boost_30": {
+        "name": "Boost 30 хвилин"
+      },
+      "boost_60": {
+        "name": "Boost 60 хвилин"
+      },
+      "circulation_30": {
+        "name": "Циркуляція 30 хвилин"
+      },
+      "circulation_60": {
+        "name": "Циркуляція 60 хвилин"
+      },
+      "night_8h": {
+        "name": "Нічний режим 8 годин"
+      },
+      "overpressure_15": {
+        "name": "Надлишковий тиск 15 хвилин"
+      },
+      "party_4h": {
+        "name": "Вечірка 4 години"
+      },
+      "stop_all": {
+        "name": "Зупинити всі функції"
+      }
+    },
+    "number": {
+      "alfa_1_ntc_temp_correction": {
+        "name": "ALFA 1 — корекція NTC"
+      },
+      "alfa_1_temp_correction": {
+        "name": "ALFA 1 — корекція температури"
+      },
+      "alfa_2_ntc_temp_correction": {
+        "name": "ALFA 2 — корекція NTC"
+      },
+      "alfa_2_temp_correction": {
+        "name": "ALFA 2 — корекція температури"
+      },
+      "alfa_3_ntc_temp_correction": {
+        "name": "ALFA 3 — корекція NTC"
+      },
+      "alfa_3_temp_correction": {
+        "name": "ALFA 3 — корекція температури"
+      },
+      "alfa_4_ntc_temp_correction": {
+        "name": "ALFA 4 — корекція NTC"
+      },
+      "alfa_4_temp_correction": {
+        "name": "ALFA 4 — корекція температури"
+      },
+      "alfa_5_ntc_temp_correction": {
+        "name": "ALFA 5 — корекція NTC"
+      },
+      "alfa_5_temp_correction": {
+        "name": "ALFA 5 — корекція температури"
+      },
+      "alfa_6_ntc_temp_correction": {
+        "name": "ALFA 6 — корекція NTC"
+      },
+      "alfa_6_temp_correction": {
+        "name": "ALFA 6 — корекція температури"
+      },
+      "alfa_7_ntc_temp_correction": {
+        "name": "ALFA 7 — корекція NTC"
+      },
+      "alfa_7_temp_correction": {
+        "name": "ALFA 7 — корекція температури"
+      },
+      "alfa_8_ntc_temp_correction": {
+        "name": "ALFA 8 — корекція NTC"
+      },
+      "alfa_8_temp_correction": {
+        "name": "ALFA 8 — корекція температури"
+      },
+      "boost_timer": {
+        "name": "Boost: залишилось"
+      },
+      "circulation_timer": {
+        "name": "Циркуляція: залишилось"
+      },
+      "ext_button_1_timer": {
+        "name": "Зовнішня кнопка 1 — таймер"
+      },
+      "ext_button_2_timer": {
+        "name": "Зовнішня кнопка 2 — таймер"
+      },
+      "ext_button_3_timer": {
+        "name": "Зовнішня кнопка 3 — таймер"
+      },
+      "ext_button_4_timer": {
+        "name": "Зовнішня кнопка 4 — таймер"
+      },
+      "ext_button_5_timer": {
+        "name": "Зовнішня кнопка 5 — таймер"
+      },
+      "ext_button_6_timer": {
+        "name": "Зовнішня кнопка 6 — таймер"
+      },
+      "ext_button_7_timer": {
+        "name": "Зовнішня кнопка 7 — таймер"
+      },
+      "ext_button_8_timer": {
+        "name": "Зовнішня кнопка 8 — таймер"
+      },
+      "kitchenhood_volume": {
+        "name": "Витрата кухонної витяжки"
+      },
+      "night_timer": {
+        "name": "Нічний режим: залишилось"
+      },
+      "overpressure_timer": {
+        "name": "Надлишковий тиск: залишилось"
+      },
+      "party_timer": {
+        "name": "Режим «Вечірка»: залишилось"
+      },
+      "temperature_setpoint": {
+        "name": "Цільова температура"
+      },
+      "wall_sensor_1_temp_correction": {
+        "name": "Датчик CO2 1 — корекція температури"
+      },
+      "wall_sensor_2_temp_correction": {
+        "name": "Датчик CO2 2 — корекція температури"
+      },
+      "wall_sensor_3_temp_correction": {
+        "name": "Датчик CO2 3 — корекція температури"
+      },
+      "wall_sensor_4_temp_correction": {
+        "name": "Датчик CO2 4 — корекція температури"
+      },
+      "wall_sensor_5_temp_correction": {
+        "name": "Датчик CO2 5 — корекція температури"
+      },
+      "wall_sensor_6_temp_correction": {
+        "name": "Датчик CO2 6 — корекція температури"
+      },
+      "wall_sensor_7_temp_correction": {
+        "name": "Датчик CO2 7 — корекція температури"
+      },
+      "wall_sensor_8_temp_correction": {
+        "name": "Датчик CO2 8 — корекція температури"
+      },
+      "wall_ui_1_temp_correction": {
+        "name": "Настінна панель 1 — корекція температури"
+      },
+      "wall_ui_2_temp_correction": {
+        "name": "Настінна панель 2 — корекція температури"
+      },
+      "wall_ui_3_temp_correction": {
+        "name": "Настінна панель 3 — корекція температури"
+      },
+      "zone_boost_volume": {
+        "name": "Витрата Boost зони"
+      }
+    },
+    "sensor": {
+      "air_flow": {
+        "name": "Витрата повітря"
+      },
+      "air_quality": {
+        "name": "Якість повітря"
+      },
+      "alfa_1_address": {
+        "name": "ALFA 1 — адреса на шині"
+      },
+      "alfa_1_co2": {
+        "name": "ALFA 1 — CO2"
+      },
+      "alfa_1_humidity": {
+        "name": "ALFA 1 — вологість"
+      },
+      "alfa_1_ntc_temperature": {
+        "name": "ALFA 1 — температура NTC"
+      },
+      "alfa_1_temperature": {
+        "name": "ALFA 1 — температура"
+      },
+      "alfa_2_address": {
+        "name": "ALFA 2 — адреса на шині"
+      },
+      "alfa_2_co2": {
+        "name": "ALFA 2 — CO2"
+      },
+      "alfa_2_humidity": {
+        "name": "ALFA 2 — вологість"
+      },
+      "alfa_2_ntc_temperature": {
+        "name": "ALFA 2 — температура NTC"
+      },
+      "alfa_2_temperature": {
+        "name": "ALFA 2 — температура"
+      },
+      "alfa_3_address": {
+        "name": "ALFA 3 — адреса на шині"
+      },
+      "alfa_3_co2": {
+        "name": "ALFA 3 — CO2"
+      },
+      "alfa_3_humidity": {
+        "name": "ALFA 3 — вологість"
+      },
+      "alfa_3_ntc_temperature": {
+        "name": "ALFA 3 — температура NTC"
+      },
+      "alfa_3_temperature": {
+        "name": "ALFA 3 — температура"
+      },
+      "alfa_4_address": {
+        "name": "ALFA 4 — адреса на шині"
+      },
+      "alfa_4_co2": {
+        "name": "ALFA 4 — CO2"
+      },
+      "alfa_4_humidity": {
+        "name": "ALFA 4 — вологість"
+      },
+      "alfa_4_ntc_temperature": {
+        "name": "ALFA 4 — температура NTC"
+      },
+      "alfa_4_temperature": {
+        "name": "ALFA 4 — температура"
+      },
+      "alfa_5_address": {
+        "name": "ALFA 5 — адреса на шині"
+      },
+      "alfa_5_co2": {
+        "name": "ALFA 5 — CO2"
+      },
+      "alfa_5_humidity": {
+        "name": "ALFA 5 — вологість"
+      },
+      "alfa_5_ntc_temperature": {
+        "name": "ALFA 5 — температура NTC"
+      },
+      "alfa_5_temperature": {
+        "name": "ALFA 5 — температура"
+      },
+      "alfa_6_address": {
+        "name": "ALFA 6 — адреса на шині"
+      },
+      "alfa_6_co2": {
+        "name": "ALFA 6 — CO2"
+      },
+      "alfa_6_humidity": {
+        "name": "ALFA 6 — вологість"
+      },
+      "alfa_6_ntc_temperature": {
+        "name": "ALFA 6 — температура NTC"
+      },
+      "alfa_6_temperature": {
+        "name": "ALFA 6 — температура"
+      },
+      "alfa_7_address": {
+        "name": "ALFA 7 — адреса на шині"
+      },
+      "alfa_7_co2": {
+        "name": "ALFA 7 — CO2"
+      },
+      "alfa_7_humidity": {
+        "name": "ALFA 7 — вологість"
+      },
+      "alfa_7_ntc_temperature": {
+        "name": "ALFA 7 — температура NTC"
+      },
+      "alfa_7_temperature": {
+        "name": "ALFA 7 — температура"
+      },
+      "alfa_8_address": {
+        "name": "ALFA 8 — адреса на шині"
+      },
+      "alfa_8_co2": {
+        "name": "ALFA 8 — CO2"
+      },
+      "alfa_8_humidity": {
+        "name": "ALFA 8 — вологість"
+      },
+      "alfa_8_ntc_temperature": {
+        "name": "ALFA 8 — температура NTC"
+      },
+      "alfa_8_temperature": {
+        "name": "ALFA 8 — температура"
+      },
+      "away_begin_at": {
+        "name": "Початок відпустки"
+      },
+      "away_end_at": {
+        "name": "Кінець відпустки"
+      },
+      "boost_button_count": {
+        "name": "Кнопки Boost"
+      },
+      "boost_timer": {
+        "name": "Boost: залишилось"
+      },
+      "build_number": {
+        "name": "Номер збірки"
+      },
+      "circulation_timer": {
+        "name": "Циркуляція: залишилось"
+      },
+      "co2_max": {
+        "name": "Найвищий CO2"
+      },
+      "connected_coolbreeze": {
+        "name": "CoolBreeze підключено"
+      },
+      "device_id": {
+        "name": "Ідентифікатор пристрою"
+      },
+      "ext_button_1_timer": {
+        "name": "Зовнішня кнопка 1 — таймер"
+      },
+      "ext_button_2_timer": {
+        "name": "Зовнішня кнопка 2 — таймер"
+      },
+      "ext_button_3_timer": {
+        "name": "Зовнішня кнопка 3 — таймер"
+      },
+      "ext_button_4_timer": {
+        "name": "Зовнішня кнопка 4 — таймер"
+      },
+      "ext_button_5_timer": {
+        "name": "Зовнішня кнопка 5 — таймер"
+      },
+      "ext_button_6_timer": {
+        "name": "Зовнішня кнопка 6 — таймер"
+      },
+      "ext_button_7_timer": {
+        "name": "Зовнішня кнопка 7 — таймер"
+      },
+      "ext_button_8_timer": {
+        "name": "Зовнішня кнопка 8 — таймер"
+      },
+      "ext_sensor_1_co2": {
+        "name": "Зовнішній датчик 1 — CO2"
+      },
+      "ext_sensor_1_floor_temperature": {
+        "name": "Зовнішній датчик 1 — температура підлоги"
+      },
+      "ext_sensor_1_humidity": {
+        "name": "Зовнішній датчик 1 — вологість"
+      },
+      "ext_sensor_1_temperature": {
+        "name": "Зовнішній датчик 1 — температура"
+      },
+      "ext_sensor_2_co2": {
+        "name": "Зовнішній датчик 2 — CO2"
+      },
+      "ext_sensor_2_floor_temperature": {
+        "name": "Зовнішній датчик 2 — температура підлоги"
+      },
+      "ext_sensor_2_humidity": {
+        "name": "Зовнішній датчик 2 — вологість"
+      },
+      "ext_sensor_2_temperature": {
+        "name": "Зовнішній датчик 2 — температура"
+      },
+      "ext_sensor_3_co2": {
+        "name": "Зовнішній датчик 3 — CO2"
+      },
+      "ext_sensor_3_floor_temperature": {
+        "name": "Зовнішній датчик 3 — температура підлоги"
+      },
+      "ext_sensor_3_humidity": {
+        "name": "Зовнішній датчик 3 — вологість"
+      },
+      "ext_sensor_3_temperature": {
+        "name": "Зовнішній датчик 3 — температура"
+      },
+      "ext_sensor_4_co2": {
+        "name": "Зовнішній датчик 4 — CO2"
+      },
+      "ext_sensor_4_floor_temperature": {
+        "name": "Зовнішній датчик 4 — температура підлоги"
+      },
+      "ext_sensor_4_humidity": {
+        "name": "Зовнішній датчик 4 — вологість"
+      },
+      "ext_sensor_4_temperature": {
+        "name": "Зовнішній датчик 4 — температура"
+      },
+      "ext_sensor_5_co2": {
+        "name": "Зовнішній датчик 5 — CO2"
+      },
+      "ext_sensor_5_floor_temperature": {
+        "name": "Зовнішній датчик 5 — температура підлоги"
+      },
+      "ext_sensor_5_humidity": {
+        "name": "Зовнішній датчик 5 — вологість"
+      },
+      "ext_sensor_5_temperature": {
+        "name": "Зовнішній датчик 5 — температура"
+      },
+      "ext_sensor_6_co2": {
+        "name": "Зовнішній датчик 6 — CO2"
+      },
+      "ext_sensor_6_floor_temperature": {
+        "name": "Зовнішній датчик 6 — температура підлоги"
+      },
+      "ext_sensor_6_humidity": {
+        "name": "Зовнішній датчик 6 — вологість"
+      },
+      "ext_sensor_6_temperature": {
+        "name": "Зовнішній датчик 6 — температура"
+      },
+      "ext_sensor_7_co2": {
+        "name": "Зовнішній датчик 7 — CO2"
+      },
+      "ext_sensor_7_floor_temperature": {
+        "name": "Зовнішній датчик 7 — температура підлоги"
+      },
+      "ext_sensor_7_humidity": {
+        "name": "Зовнішній датчик 7 — вологість"
+      },
+      "ext_sensor_7_temperature": {
+        "name": "Зовнішній датчик 7 — температура"
+      },
+      "ext_sensor_8_co2": {
+        "name": "Зовнішній датчик 8 — CO2"
+      },
+      "ext_sensor_8_floor_temperature": {
+        "name": "Зовнішній датчик 8 — температура підлоги"
+      },
+      "ext_sensor_8_humidity": {
+        "name": "Зовнішній датчик 8 — вологість"
+      },
+      "ext_sensor_8_temperature": {
+        "name": "Зовнішній датчик 8 — температура"
+      },
+      "external_button_count": {
+        "name": "Зовнішні кнопки"
+      },
+      "external_sensor_count": {
+        "name": "Зовнішні датчики"
+      },
+      "fan_pwm_exhaust": {
+        "name": "Потужність витяжного вентилятора"
+      },
+      "fan_pwm_supply": {
+        "name": "Потужність припливного вентилятора"
+      },
+      "fan_rpm_exhaust": {
+        "name": "Оберти витяжного вентилятора"
+      },
+      "fan_rpm_supply": {
+        "name": "Оберти припливного вентилятора"
+      },
+      "filter_wear": {
+        "name": "Забруднення фільтра"
+      },
+      "firmware": {
+        "name": "Версія прошивки"
+      },
+      "heat_recovered": {
+        "name": "Рекуперовано тепла"
+      },
+      "heating_power": {
+        "name": "Потужність донагрівача"
+      },
+      "humidity_ambient": {
+        "name": "Вологість зовнішнього повітря"
+      },
+      "humidity_fresh": {
+        "name": "Вологість припливного повітря"
+      },
+      "humidity_indoor": {
+        "name": "Вологість витяжного повітря"
+      },
+      "humidity_mean_indoor": {
+        "name": "Вологість у приміщенні"
+      },
+      "humidity_waste": {
+        "name": "Вологість викидного повітря"
+      },
+      "hw_revision": {
+        "name": "Ревізія апаратної частини"
+      },
+      "mac_address": {
+        "name": "MAC-адреса"
+      },
+      "model": {
+        "name": "Модель"
+      },
+      "night_timer": {
+        "name": "Нічний режим: залишилось"
+      },
+      "overpressure_timer": {
+        "name": "Надлишковий тиск: залишилось"
+      },
+      "party_timer": {
+        "name": "Режим «Вечірка»: залишилось"
+      },
+      "performance_factor": {
+        "name": "Коефіцієнт ефективності"
+      },
+      "power_consumption": {
+        "name": "Споживана потужність"
+      },
+      "regmap_version": {
+        "name": "Версія карти регістрів"
+      },
+      "rtc_battery_voltage": {
+        "name": "Напруга батареї RTC"
+      },
+      "serial_number": {
+        "name": "Серійний номер"
+      },
+      "stat_fails": {
+        "name": "Збоїв Modbus"
+      },
+      "stat_reads": {
+        "name": "Читань Modbus"
+      },
+      "stat_writes": {
+        "name": "Записів Modbus"
+      },
+      "temp_ambient": {
+        "name": "Температура зовнішнього повітря"
+      },
+      "temp_fresh": {
+        "name": "Температура припливного повітря"
+      },
+      "temp_indoor": {
+        "name": "Температура витяжного повітря"
+      },
+      "temp_mean_indoor": {
+        "name": "Температура в приміщенні"
+      },
+      "temp_outdoor_ntc": {
+        "name": "Температура зовні (NTC)"
+      },
+      "temp_waste": {
+        "name": "Температура викидного повітря"
+      },
+      "uin1_voltage": {
+        "name": "Напруга входу UIN1"
+      },
+      "uin2_voltage": {
+        "name": "Напруга входу UIN2"
+      },
+      "valve_count_exhaust": {
+        "name": "Клапани витяжки"
+      },
+      "valve_count_supply": {
+        "name": "Клапани припливу"
+      },
+      "variant": {
+        "name": "Варіант моделі"
+      },
+      "ventilation_text": {
+        "name": "Режим вентиляції"
+      },
+      "wall_sensor_1_address": {
+        "name": "Датчик CO2 1 — адреса на шині"
+      },
+      "wall_sensor_1_co2": {
+        "name": "Датчик CO2 1 — CO2"
+      },
+      "wall_sensor_1_humidity": {
+        "name": "Датчик CO2 1 — вологість"
+      },
+      "wall_sensor_1_temperature": {
+        "name": "Датчик CO2 1 — температура"
+      },
+      "wall_sensor_2_address": {
+        "name": "Датчик CO2 2 — адреса на шині"
+      },
+      "wall_sensor_2_co2": {
+        "name": "Датчик CO2 2 — CO2"
+      },
+      "wall_sensor_2_humidity": {
+        "name": "Датчик CO2 2 — вологість"
+      },
+      "wall_sensor_2_temperature": {
+        "name": "Датчик CO2 2 — температура"
+      },
+      "wall_sensor_3_address": {
+        "name": "Датчик CO2 3 — адреса на шині"
+      },
+      "wall_sensor_3_co2": {
+        "name": "Датчик CO2 3 — CO2"
+      },
+      "wall_sensor_3_humidity": {
+        "name": "Датчик CO2 3 — вологість"
+      },
+      "wall_sensor_3_temperature": {
+        "name": "Датчик CO2 3 — температура"
+      },
+      "wall_sensor_4_address": {
+        "name": "Датчик CO2 4 — адреса на шині"
+      },
+      "wall_sensor_4_co2": {
+        "name": "Датчик CO2 4 — CO2"
+      },
+      "wall_sensor_4_humidity": {
+        "name": "Датчик CO2 4 — вологість"
+      },
+      "wall_sensor_4_temperature": {
+        "name": "Датчик CO2 4 — температура"
+      },
+      "wall_sensor_5_address": {
+        "name": "Датчик CO2 5 — адреса на шині"
+      },
+      "wall_sensor_5_co2": {
+        "name": "Датчик CO2 5 — CO2"
+      },
+      "wall_sensor_5_humidity": {
+        "name": "Датчик CO2 5 — вологість"
+      },
+      "wall_sensor_5_temperature": {
+        "name": "Датчик CO2 5 — температура"
+      },
+      "wall_sensor_6_address": {
+        "name": "Датчик CO2 6 — адреса на шині"
+      },
+      "wall_sensor_6_co2": {
+        "name": "Датчик CO2 6 — CO2"
+      },
+      "wall_sensor_6_humidity": {
+        "name": "Датчик CO2 6 — вологість"
+      },
+      "wall_sensor_6_temperature": {
+        "name": "Датчик CO2 6 — температура"
+      },
+      "wall_sensor_7_address": {
+        "name": "Датчик CO2 7 — адреса на шині"
+      },
+      "wall_sensor_7_co2": {
+        "name": "Датчик CO2 7 — CO2"
+      },
+      "wall_sensor_7_humidity": {
+        "name": "Датчик CO2 7 — вологість"
+      },
+      "wall_sensor_7_temperature": {
+        "name": "Датчик CO2 7 — температура"
+      },
+      "wall_sensor_8_address": {
+        "name": "Датчик CO2 8 — адреса на шині"
+      },
+      "wall_sensor_8_co2": {
+        "name": "Датчик CO2 8 — CO2"
+      },
+      "wall_sensor_8_humidity": {
+        "name": "Датчик CO2 8 — вологість"
+      },
+      "wall_sensor_8_temperature": {
+        "name": "Датчик CO2 8 — температура"
+      },
+      "wall_ui_1_address": {
+        "name": "Настінна панель 1 — адреса на шині"
+      },
+      "wall_ui_1_co2": {
+        "name": "Настінна панель 1 — CO2"
+      },
+      "wall_ui_1_humidity": {
+        "name": "Настінна панель 1 — вологість"
+      },
+      "wall_ui_1_temperature": {
+        "name": "Настінна панель 1 — температура"
+      },
+      "wall_ui_2_address": {
+        "name": "Настінна панель 2 — адреса на шині"
+      },
+      "wall_ui_2_co2": {
+        "name": "Настінна панель 2 — CO2"
+      },
+      "wall_ui_2_humidity": {
+        "name": "Настінна панель 2 — вологість"
+      },
+      "wall_ui_2_temperature": {
+        "name": "Настінна панель 2 — температура"
+      },
+      "wall_ui_3_address": {
+        "name": "Настінна панель 3 — адреса на шині"
+      },
+      "wall_ui_3_co2": {
+        "name": "Настінна панель 3 — CO2"
+      },
+      "wall_ui_3_humidity": {
+        "name": "Настінна панель 3 — вологість"
+      },
+      "wall_ui_3_temperature": {
+        "name": "Настінна панель 3 — температура"
+      }
+    },
+    "switch": {
+      "antiradon": {
+        "name": "Захист від радону"
+      },
+      "bypass_enable": {
+        "name": "Автоматичний байпас"
+      },
+      "comfort_enable": {
+        "name": "Керування комфортною температурою"
+      },
+      "cooling_enable": {
+        "name": "Додаткове охолодження"
+      },
+      "ext_button_1_active": {
+        "name": "Зовнішня кнопка 1 — активна"
+      },
+      "ext_button_1_present": {
+        "name": "Зовнішня кнопка 1 — наявність"
+      },
+      "ext_button_2_active": {
+        "name": "Зовнішня кнопка 2 — активна"
+      },
+      "ext_button_2_present": {
+        "name": "Зовнішня кнопка 2 — наявність"
+      },
+      "ext_button_3_active": {
+        "name": "Зовнішня кнопка 3 — активна"
+      },
+      "ext_button_3_present": {
+        "name": "Зовнішня кнопка 3 — наявність"
+      },
+      "ext_button_4_active": {
+        "name": "Зовнішня кнопка 4 — активна"
+      },
+      "ext_button_4_present": {
+        "name": "Зовнішня кнопка 4 — наявність"
+      },
+      "ext_button_5_active": {
+        "name": "Зовнішня кнопка 5 — активна"
+      },
+      "ext_button_5_present": {
+        "name": "Зовнішня кнопка 5 — наявність"
+      },
+      "ext_button_6_active": {
+        "name": "Зовнішня кнопка 6 — активна"
+      },
+      "ext_button_6_present": {
+        "name": "Зовнішня кнопка 6 — наявність"
+      },
+      "ext_button_7_active": {
+        "name": "Зовнішня кнопка 7 — активна"
+      },
+      "ext_button_7_present": {
+        "name": "Зовнішня кнопка 7 — наявність"
+      },
+      "ext_button_8_active": {
+        "name": "Зовнішня кнопка 8 — активна"
+      },
+      "ext_button_8_present": {
+        "name": "Зовнішня кнопка 8 — наявність"
+      },
+      "ext_sensor_1_present": {
+        "name": "Зовнішній датчик 1 — наявність"
+      },
+      "ext_sensor_2_present": {
+        "name": "Зовнішній датчик 2 — наявність"
+      },
+      "ext_sensor_3_present": {
+        "name": "Зовнішній датчик 3 — наявність"
+      },
+      "ext_sensor_4_present": {
+        "name": "Зовнішній датчик 4 — наявність"
+      },
+      "ext_sensor_5_present": {
+        "name": "Зовнішній датчик 5 — наявність"
+      },
+      "ext_sensor_6_present": {
+        "name": "Зовнішній датчик 6 — наявність"
+      },
+      "ext_sensor_7_present": {
+        "name": "Зовнішній датчик 7 — наявність"
+      },
+      "ext_sensor_8_present": {
+        "name": "Зовнішній датчик 8 — наявність"
+      },
+      "heating_enable": {
+        "name": "Додатковий нагрів"
+      },
+      "kitchenhood_normally_open": {
+        "name": "Кухонна витяжка: нормально розімкнений"
+      },
+      "time_program": {
+        "name": "Розклад"
+      }
+    }
+  }
+}

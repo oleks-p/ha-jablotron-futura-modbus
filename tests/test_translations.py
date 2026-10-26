@@ -107,3 +107,68 @@ def test_every_description_carries_a_translation_key():
     for reg in REGISTERS:
         if number._is_number(reg) or switch._is_switch(reg):
             assert reg.key, "a writable register with no key cannot be translated"
+
+
+def test_ukrainian_covers_every_entity(generated):
+    """Every entity has a Ukrainian name.
+
+    Home Assistant falls back to English per missing key, so a gap here is
+    invisible in testing and shows up as a half-Ukrainian device list. The
+    generator returns None rather than guessing precisely so this can fail.
+    """
+    import gen_translations
+
+    uk, missing = gen_translations.ukrainian(generated)
+    assert not missing, (
+        f"{len(missing)} entities have no Ukrainian name, e.g. {missing[:5]} "
+        "-- add them to tools/uk_names.py"
+    )
+
+    shipped = _load("translations/uk.json")["entity"]
+    assert shipped == uk, "run tools/gen_translations.py"
+
+
+def test_ukrainian_is_actually_ukrainian(generated):
+    """Catch an English word left in the Ukrainian table.
+
+    Not "does it contain Cyrillic": several names are legitimately all-Latin,
+    such as "ALFA 3 — CO2", a brand name next to a chemical formula with nothing
+    to translate between them. So the check strips the proper nouns this device
+    genuinely uses and fails on whatever Latin is left -- which is what an
+    untranslated English word would be.
+
+    `Boost` is on the list deliberately. It is the word on the physical wall
+    buttons and in this house's own entity names, so translating it would make
+    the dashboard disagree with the hardware.
+    """
+    import re
+
+    import gen_translations
+
+    # Units first: the C of °C is not an English word.
+    proper = (
+        "°C",
+        "Boost",
+        "CoolBreeze",
+        "VarioBreeze",
+        "SuperBreeze",
+        "ALFA",
+        "Modbus",
+        "CO2",
+        "NTC",
+        "RTC",
+        "MAC",
+        "UIN1",
+        "UIN2",
+    )
+    uk, _ = gen_translations.ukrainian(generated)
+    for domain, keys in uk.items():
+        for key, value in keys.items():
+            rest = value["name"]
+            for word in proper:
+                rest = rest.replace(word, "")
+            leftover = re.findall(r"[A-Za-z]+", rest)
+            assert not leftover, (
+                f"{domain}.{key} still has English in it: {leftover} "
+                f"in {value['name']!r}"
+            )
