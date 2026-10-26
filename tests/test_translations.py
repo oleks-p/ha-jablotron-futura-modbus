@@ -23,6 +23,46 @@ COMPONENT = ROOT / "custom_components" / "jablotron_futura_modbus"
 sys.path.insert(0, str(ROOT / "tools"))
 
 
+#: Words that are legitimately Latin in a Ukrainian string: brand names, units,
+#: protocol terms, and `Boost` -- which stays untranslated because it is the word
+#: on the physical wall buttons and in this house's own entity names.
+PROPER_NOUNS = (
+    "°C",
+    "Boost",
+    "CoolBreeze",
+    "VarioBreeze",
+    "SuperBreeze",
+    "ALFA",
+    "Jablotron",
+    "Futura",
+    "Modbus",
+    "Home Assistant",
+    "Unit ID",
+    "TCP",
+    "holding",
+    "CO2",
+    "NTC",
+    "RTC",
+    "MAC",
+    "UIN1",
+    "UIN2",
+)
+
+
+def _strip_proper(text: str) -> str:
+    """Remove what is legitimately Latin, leaving only suspect words.
+
+    Placeholders go first: `{slot}` is a key Home Assistant substitutes into the
+    string, so its name stays English in every language.
+    """
+    import re
+
+    text = re.sub(r"\{\w+\}", "", text)
+    for word in PROPER_NOUNS:
+        text = text.replace(word, "")
+    return text
+
+
 def _load(name: str) -> dict:
     return json.loads((COMPONENT / name).read_text())
 
@@ -110,12 +150,25 @@ def test_every_description_carries_a_translation_key():
 
 
 def test_ukrainian_covers_every_entity(generated):
-    """Every entity has a Ukrainian name.
+    """Every English entity string has a Ukrainian one, names and states alike.
 
-    Home Assistant falls back to English per missing key, so a gap here is
-    invisible in testing and shows up as a half-Ukrainian device list. The
-    generator returns None rather than guessing precisely so this can fail.
+    Compared as leaf paths against en.json rather than against the generator's
+    output, because the generator does not produce the `select` block -- those
+    carry option labels and are hand-written. An earlier version of this test
+    checked only the generated domains, so uk.json shipped with no `select` at
+    all and three pickers stayed English on screen. Comparing against English
+    catches a missing domain, a missing name and a missing option label.
     """
+    en_leaves = _leaves(_load("translations/en.json")["entity"])
+    uk_leaves = _leaves(_load("translations/uk.json")["entity"])
+    missing = en_leaves - uk_leaves
+    extra = uk_leaves - en_leaves
+    assert not missing, f"untranslated: {sorted(missing)[:8]}"
+    assert not extra, f"translations with no English source: {sorted(extra)[:8]}"
+
+
+def test_ukrainian_generated_block_is_current(generated):
+    """The generated domains match tools/uk_names.py."""
     import gen_translations
 
     uk, missing = gen_translations.ukrainian(generated)
@@ -123,52 +176,92 @@ def test_ukrainian_covers_every_entity(generated):
         f"{len(missing)} entities have no Ukrainian name, e.g. {missing[:5]} "
         "-- add them to tools/uk_names.py"
     )
-
     shipped = _load("translations/uk.json")["entity"]
-    assert shipped == uk, "run tools/gen_translations.py"
+    for domain, keys in uk.items():
+        assert shipped.get(domain) == keys, f"{domain}: run tools/gen_translations.py"
 
 
-def test_ukrainian_is_actually_ukrainian(generated):
-    """Catch an English word left in the Ukrainian table.
+def test_placeholders_survive_translation():
+    """A {placeholder} dropped in translation renders as a literal brace."""
+    import re
+
+    en = _load("translations/en.json")["entity"]
+    uk = _load("translations/uk.json")["entity"]
+    for domain, keys in en.items():
+        for key, value in keys.items():
+            want = set(re.findall(r"\{(\w+)\}", value.get("name", "")))
+            got = set(re.findall(r"\{(\w+)\}", uk[domain][key].get("name", "")))
+            assert want == got, (
+                f"{domain}.{key}: placeholders {want} became {got}"
+            )
+
+
+def test_ukrainian_is_actually_ukrainian():
+    """Catch an English word left anywhere in the Ukrainian entity block.
 
     Not "does it contain Cyrillic": several names are legitimately all-Latin,
-    such as "ALFA 3 — CO2", a brand name next to a chemical formula with nothing
-    to translate between them. So the check strips the proper nouns this device
-    genuinely uses and fails on whatever Latin is left -- which is what an
-    untranslated English word would be.
+    such as "ALFA 3 — CO2", a brand name beside a chemical formula with nothing
+    to translate between them. So the proper nouns this device genuinely uses are
+    stripped and whatever Latin is left fails -- which is what an untranslated
+    English word would be.
 
-    `Boost` is on the list deliberately. It is the word on the physical wall
-    buttons and in this house's own entity names, so translating it would make
-    the dashboard disagree with the hardware.
+    Reads the shipped file rather than the generator, so the hand-written
+    `select` block is covered as well.
     """
     import re
 
-    import gen_translations
-
-    # Units first: the C of °C is not an English word.
-    proper = (
-        "°C",
-        "Boost",
-        "CoolBreeze",
-        "VarioBreeze",
-        "SuperBreeze",
-        "ALFA",
-        "Modbus",
-        "CO2",
-        "NTC",
-        "RTC",
-        "MAC",
-        "UIN1",
-        "UIN2",
-    )
-    uk, _ = gen_translations.ukrainian(generated)
+    uk = _load("translations/uk.json")["entity"]
     for domain, keys in uk.items():
         for key, value in keys.items():
-            rest = value["name"]
-            for word in proper:
-                rest = rest.replace(word, "")
-            leftover = re.findall(r"[A-Za-z]+", rest)
-            assert not leftover, (
-                f"{domain}.{key} still has English in it: {leftover} "
-                f"in {value['name']!r}"
-            )
+            strings = {"name": value.get("name", "")}
+            strings |= {f"state.{k}": v for k, v in value.get("state", {}).items()}
+            for where, text in strings.items():
+                if text.isdigit():
+                    continue  # ventilation levels 1..5 are numbers
+                leftover = re.findall(r"[A-Za-z]+", _strip_proper(text))
+                assert not leftover, (
+                    f"{domain}.{key}.{where} still has English in it: "
+                    f"{leftover} in {text!r}"
+                )
+
+
+def _leaves(obj: object, path: str = "") -> set[str]:
+    """Every leaf path in a nested dict, so two files can be compared by shape."""
+    if isinstance(obj, dict):
+        out: set[str] = set()
+        for key, value in obj.items():
+            out |= _leaves(value, f"{path}.{key}" if path else key)
+        return out
+    return {path}
+
+
+def test_ukrainian_covers_config_options_and_services():
+    """The hand-written sections must match English key for key.
+
+    `entity` is generated and tested above; these three are written by hand, so
+    nothing otherwise notices a new config field or service argument shipping
+    without a Ukrainian string. Home Assistant would quietly show the English,
+    which is exactly the half-translated dialog this is meant to prevent.
+    """
+    en = _load("translations/en.json")
+    uk = _load("translations/uk.json")
+    for section in ("config", "options", "services"):
+        assert section in uk, f"uk.json has no {section} section"
+        missing = _leaves(en[section]) - _leaves(uk[section])
+        extra = _leaves(uk[section]) - _leaves(en[section])
+        assert not missing, f"{section}: untranslated {sorted(missing)}"
+        assert not extra, f"{section}: translations with no English source {sorted(extra)}"
+
+
+def test_ukrainian_prose_is_not_english():
+    """A long Latin run in the hand-written sections means a forgotten string."""
+    import re
+
+    uk = _load("translations/uk.json")
+    for section in ("config", "options", "services"):
+        for path in sorted(_leaves(uk[section])):
+            value = uk[section]
+            for part in path.split("."):
+                value = value[part]
+            words = re.findall(r"[A-Za-z]{3,}", _strip_proper(value))
+            assert not words, f"{section}.{path} looks untranslated: {words} in {value!r}"

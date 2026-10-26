@@ -159,7 +159,14 @@ def main() -> int:
         path = COMPONENT / "translations" / "uk.json"
         existing = json.loads(path.read_text()) if path.exists() else {}
         merged = dict(existing)
-        merged["entity"] = uk
+        merged["entity"] = dict(uk)
+        # `select` is hand-written here too -- it carries option labels, which no
+        # generator should invent -- so it is carried over rather than dropped.
+        # Writing `entity` wholesale had silently deleted it, which is how the
+        # three selects shipped untranslated.
+        if kept := existing.get("entity", {}).get("select"):
+            merged["entity"]["select"] = kept
+        merged["entity"] = dict(sorted(merged["entity"].items()))
         text = json.dumps(merged, indent=2, ensure_ascii=False) + "\n"
         if not path.exists() or path.read_text() != text:
             path.write_text(text)
