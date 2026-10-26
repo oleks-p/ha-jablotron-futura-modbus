@@ -68,6 +68,7 @@ class FuturaSwitch(FuturaEntity, SwitchEntity):
             coordinator,
             SwitchEntityDescription(
                 key=reg.key,
+                translation_key=reg.key,
                 name=reg.name or reg.key.replace("_", " ").capitalize(),
                 icon=_ICONS.get(reg.key),
                 entity_category=EntityCategory.CONFIG if reg.config else None,

@@ -78,6 +78,7 @@ class FuturaNumber(FuturaEntity, NumberEntity):
             coordinator,
             NumberEntityDescription(
                 key=reg.key,
+                translation_key=reg.key,
                 name=reg.name or reg.key.replace("_", " ").capitalize(),
                 native_unit_of_measurement=reg.unit,
                 native_min_value=reg.min_value,

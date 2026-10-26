@@ -155,7 +155,370 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "any_error": {
+        "name": "Fault"
+      },
+      "any_warning": {
+        "name": "Warning"
+      },
+      "config_bypass": {
+        "name": "Supports bypass"
+      },
+      "config_coolbreeze": {
+        "name": "Supports coolbreeze"
+      },
+      "config_coolbreeze_cooling": {
+        "name": "Supports coolbreeze cooling"
+      },
+      "config_coolbreeze_heating": {
+        "name": "Supports coolbreeze heating"
+      },
+      "config_exchanger_control": {
+        "name": "Supports exchanger control"
+      },
+      "config_inner_circulation": {
+        "name": "Supports inner circulation"
+      },
+      "config_internal_heating": {
+        "name": "Supports internal heating"
+      },
+      "config_variobreeze": {
+        "name": "Supports variobreeze"
+      },
+      "error_coolbreeze_communication": {
+        "name": "Error: coolbreeze communication"
+      },
+      "error_coolbreeze_outdoor_unit": {
+        "name": "Error: coolbreeze outdoor unit"
+      },
+      "error_exchanger_communication": {
+        "name": "Error: exchanger communication"
+      },
+      "error_exchanger_damper_position": {
+        "name": "Error: exchanger damper position"
+      },
+      "error_fan_exhaust": {
+        "name": "Error: fan exhaust"
+      },
+      "error_fan_exhaust_blocked": {
+        "name": "Error: fan exhaust blocked"
+      },
+      "error_fan_supply": {
+        "name": "Error: fan supply"
+      },
+      "error_fan_supply_blocked": {
+        "name": "Error: fan supply blocked"
+      },
+      "error_io_board_communication": {
+        "name": "Error: io board communication"
+      },
+      "error_sensor_ambient": {
+        "name": "Error: sensor ambient"
+      },
+      "error_sensor_fresh": {
+        "name": "Error: sensor fresh"
+      },
+      "error_sensor_indoor": {
+        "name": "Error: sensor indoor"
+      },
+      "error_sensor_waste": {
+        "name": "Error: sensor waste"
+      },
+      "input_boost_input": {
+        "name": "Input boost input"
+      },
+      "input_factory_button": {
+        "name": "Input factory button"
+      },
+      "input_uin1": {
+        "name": "Input uin1"
+      },
+      "input_uin2": {
+        "name": "Input uin2"
+      },
+      "input_user_button": {
+        "name": "Input user button"
+      },
+      "mode_antifreeze_active": {
+        "name": "Antifreeze active"
+      },
+      "mode_antiradon_active": {
+        "name": "Antiradon active"
+      },
+      "mode_away_active": {
+        "name": "Away active"
+      },
+      "mode_boost_active": {
+        "name": "Boost active"
+      },
+      "mode_bypass_open": {
+        "name": "Bypass open"
+      },
+      "mode_circulation_active": {
+        "name": "Circulation active"
+      },
+      "mode_device_on": {
+        "name": "Device on"
+      },
+      "mode_drying_running": {
+        "name": "Drying running"
+      },
+      "mode_emergency_stop": {
+        "name": "Emergency stop"
+      },
+      "mode_filter_check_running": {
+        "name": "Filter check running"
+      },
+      "mode_low_outdoor_temp_limit": {
+        "name": "Low outdoor temp limit"
+      },
+      "mode_night_active": {
+        "name": "Night active"
+      },
+      "mode_overpressure_active": {
+        "name": "Overpressure active"
+      },
+      "mode_party_active": {
+        "name": "Party active"
+      },
+      "mode_pressure_loss_measurement": {
+        "name": "Pressure loss measurement"
+      },
+      "mode_service_mode": {
+        "name": "Service mode"
+      },
+      "mode_standby": {
+        "name": "Standby"
+      },
+      "mode_starting_up": {
+        "name": "Starting up"
+      },
+      "mode_stopped_after_error": {
+        "name": "Stopped after error"
+      },
+      "mode_time_program_active": {
+        "name": "Time program active"
+      },
+      "mode_waste_air_below_minus_three": {
+        "name": "Waste air below minus three"
+      },
+      "mode_zone_boost": {
+        "name": "Zone boost"
+      },
+      "mode_zone_pressure_loss_measurement": {
+        "name": "Zone pressure loss measurement"
+      },
+      "warning_emergency_stop": {
+        "name": "Warning: emergency stop"
+      },
+      "warning_fan_exhaust_overspeed": {
+        "name": "Warning: fan exhaust overspeed"
+      },
+      "warning_fan_supply_overspeed": {
+        "name": "Warning: fan supply overspeed"
+      },
+      "warning_filter_too_dirty": {
+        "name": "Warning: filter too dirty"
+      },
+      "warning_filter_uninitialised": {
+        "name": "Warning: filter uninitialised"
+      },
+      "warning_filter_used_too_long": {
+        "name": "Warning: filter used too long"
+      },
+      "warning_outdoor_temp_too_low": {
+        "name": "Warning: outdoor temp too low"
+      },
+      "warning_rtc_battery_low": {
+        "name": "Warning: rtc battery low"
+      },
+      "warning_superbreeze_communication": {
+        "name": "Warning: superbreeze communication"
+      },
+      "warning_superbreeze_general": {
+        "name": "Warning: superbreeze general"
+      },
+      "warning_zone_config_exhaust": {
+        "name": "Warning: zone config exhaust"
+      },
+      "warning_zone_config_supply": {
+        "name": "Warning: zone config supply"
+      }
+    },
+    "button": {
+      "boost_30": {
+        "name": "Boost 30 minutes"
+      },
+      "boost_60": {
+        "name": "Boost 60 minutes"
+      },
+      "circulation_30": {
+        "name": "Circulation 30 minutes"
+      },
+      "circulation_60": {
+        "name": "Circulation 60 minutes"
+      },
+      "night_8h": {
+        "name": "Night mode 8 hours"
+      },
+      "overpressure_15": {
+        "name": "Overpressure 15 minutes"
+      },
+      "party_4h": {
+        "name": "Party 4 hours"
+      },
+      "stop_all": {
+        "name": "Stop all functions"
+      }
+    },
+    "number": {
+      "alfa_1_ntc_temp_correction": {
+        "name": "ALFA 1 NTC offset"
+      },
+      "alfa_1_temp_correction": {
+        "name": "ALFA 1 offset"
+      },
+      "alfa_2_ntc_temp_correction": {
+        "name": "ALFA 2 NTC offset"
+      },
+      "alfa_2_temp_correction": {
+        "name": "ALFA 2 offset"
+      },
+      "alfa_3_ntc_temp_correction": {
+        "name": "ALFA 3 NTC offset"
+      },
+      "alfa_3_temp_correction": {
+        "name": "ALFA 3 offset"
+      },
+      "alfa_4_ntc_temp_correction": {
+        "name": "ALFA 4 NTC offset"
+      },
+      "alfa_4_temp_correction": {
+        "name": "ALFA 4 offset"
+      },
+      "alfa_5_ntc_temp_correction": {
+        "name": "ALFA 5 NTC offset"
+      },
+      "alfa_5_temp_correction": {
+        "name": "ALFA 5 offset"
+      },
+      "alfa_6_ntc_temp_correction": {
+        "name": "ALFA 6 NTC offset"
+      },
+      "alfa_6_temp_correction": {
+        "name": "ALFA 6 offset"
+      },
+      "alfa_7_ntc_temp_correction": {
+        "name": "ALFA 7 NTC offset"
+      },
+      "alfa_7_temp_correction": {
+        "name": "ALFA 7 offset"
+      },
+      "alfa_8_ntc_temp_correction": {
+        "name": "ALFA 8 NTC offset"
+      },
+      "alfa_8_temp_correction": {
+        "name": "ALFA 8 offset"
+      },
+      "boost_timer": {
+        "name": "Boost remaining"
+      },
+      "circulation_timer": {
+        "name": "Circulation remaining"
+      },
+      "ext_button_1_timer": {
+        "name": "External button 1 timer"
+      },
+      "ext_button_2_timer": {
+        "name": "External button 2 timer"
+      },
+      "ext_button_3_timer": {
+        "name": "External button 3 timer"
+      },
+      "ext_button_4_timer": {
+        "name": "External button 4 timer"
+      },
+      "ext_button_5_timer": {
+        "name": "External button 5 timer"
+      },
+      "ext_button_6_timer": {
+        "name": "External button 6 timer"
+      },
+      "ext_button_7_timer": {
+        "name": "External button 7 timer"
+      },
+      "ext_button_8_timer": {
+        "name": "External button 8 timer"
+      },
+      "kitchenhood_volume": {
+        "name": "Kitchen hood volume"
+      },
+      "night_timer": {
+        "name": "Night mode remaining"
+      },
+      "overpressure_timer": {
+        "name": "Overpressure remaining"
+      },
+      "party_timer": {
+        "name": "Party mode remaining"
+      },
+      "temperature_setpoint": {
+        "name": "Target temperature"
+      },
+      "wall_sensor_1_temp_correction": {
+        "name": "CO2 sensor 1 offset"
+      },
+      "wall_sensor_2_temp_correction": {
+        "name": "CO2 sensor 2 offset"
+      },
+      "wall_sensor_3_temp_correction": {
+        "name": "CO2 sensor 3 offset"
+      },
+      "wall_sensor_4_temp_correction": {
+        "name": "CO2 sensor 4 offset"
+      },
+      "wall_sensor_5_temp_correction": {
+        "name": "CO2 sensor 5 offset"
+      },
+      "wall_sensor_6_temp_correction": {
+        "name": "CO2 sensor 6 offset"
+      },
+      "wall_sensor_7_temp_correction": {
+        "name": "CO2 sensor 7 offset"
+      },
+      "wall_sensor_8_temp_correction": {
+        "name": "CO2 sensor 8 offset"
+      },
+      "wall_ui_1_temp_correction": {
+        "name": "Wall controller 1 offset"
+      },
+      "wall_ui_2_temp_correction": {
+        "name": "Wall controller 2 offset"
+      },
+      "wall_ui_3_temp_correction": {
+        "name": "Wall controller 3 offset"
+      },
+      "zone_boost_volume": {
+        "name": "Zone boost volume"
+      }
+    },
     "select": {
+      "external_button_mode": {
+        "name": "External button {slot} mode",
+        "state": {
+          "boost": "Boost",
+          "kitchen_hood": "Kitchen hood"
+        }
+      },
+      "humidity_mode": {
+        "name": "Humidity mode",
+        "state": {
+          "dry": "Dry",
+          "comfort": "Comfort",
+          "wet": "Wet"
+        }
+      },
       "schematic": {
         "name": "Schematic",
         "state": {
@@ -164,6 +527,650 @@
           "service": "Service schematic",
           "diagram": "Airflow diagram"
         }
+      },
+      "ventilation_mode": {
+        "name": "Ventilation",
+        "state": {
+          "off": "Off",
+          "1": "1",
+          "2": "2",
+          "3": "3",
+          "4": "4",
+          "5": "5",
+          "auto": "Auto"
+        }
+      },
+      "zone_priority": {
+        "name": "Zone auto priority",
+        "state": {
+          "temperature": "Temperature",
+          "co2": "CO2"
+        }
+      }
+    },
+    "sensor": {
+      "air_flow": {
+        "name": "Air flow"
+      },
+      "air_quality": {
+        "name": "Air quality"
+      },
+      "alfa_1_address": {
+        "name": "ALFA 1 bus address"
+      },
+      "alfa_1_co2": {
+        "name": "ALFA 1 CO2"
+      },
+      "alfa_1_humidity": {
+        "name": "ALFA 1 humidity"
+      },
+      "alfa_1_ntc_temperature": {
+        "name": "ALFA 1 NTC temperature"
+      },
+      "alfa_1_temperature": {
+        "name": "ALFA 1 temperature"
+      },
+      "alfa_2_address": {
+        "name": "ALFA 2 bus address"
+      },
+      "alfa_2_co2": {
+        "name": "ALFA 2 CO2"
+      },
+      "alfa_2_humidity": {
+        "name": "ALFA 2 humidity"
+      },
+      "alfa_2_ntc_temperature": {
+        "name": "ALFA 2 NTC temperature"
+      },
+      "alfa_2_temperature": {
+        "name": "ALFA 2 temperature"
+      },
+      "alfa_3_address": {
+        "name": "ALFA 3 bus address"
+      },
+      "alfa_3_co2": {
+        "name": "ALFA 3 CO2"
+      },
+      "alfa_3_humidity": {
+        "name": "ALFA 3 humidity"
+      },
+      "alfa_3_ntc_temperature": {
+        "name": "ALFA 3 NTC temperature"
+      },
+      "alfa_3_temperature": {
+        "name": "ALFA 3 temperature"
+      },
+      "alfa_4_address": {
+        "name": "ALFA 4 bus address"
+      },
+      "alfa_4_co2": {
+        "name": "ALFA 4 CO2"
+      },
+      "alfa_4_humidity": {
+        "name": "ALFA 4 humidity"
+      },
+      "alfa_4_ntc_temperature": {
+        "name": "ALFA 4 NTC temperature"
+      },
+      "alfa_4_temperature": {
+        "name": "ALFA 4 temperature"
+      },
+      "alfa_5_address": {
+        "name": "ALFA 5 bus address"
+      },
+      "alfa_5_co2": {
+        "name": "ALFA 5 CO2"
+      },
+      "alfa_5_humidity": {
+        "name": "ALFA 5 humidity"
+      },
+      "alfa_5_ntc_temperature": {
+        "name": "ALFA 5 NTC temperature"
+      },
+      "alfa_5_temperature": {
+        "name": "ALFA 5 temperature"
+      },
+      "alfa_6_address": {
+        "name": "ALFA 6 bus address"
+      },
+      "alfa_6_co2": {
+        "name": "ALFA 6 CO2"
+      },
+      "alfa_6_humidity": {
+        "name": "ALFA 6 humidity"
+      },
+      "alfa_6_ntc_temperature": {
+        "name": "ALFA 6 NTC temperature"
+      },
+      "alfa_6_temperature": {
+        "name": "ALFA 6 temperature"
+      },
+      "alfa_7_address": {
+        "name": "ALFA 7 bus address"
+      },
+      "alfa_7_co2": {
+        "name": "ALFA 7 CO2"
+      },
+      "alfa_7_humidity": {
+        "name": "ALFA 7 humidity"
+      },
+      "alfa_7_ntc_temperature": {
+        "name": "ALFA 7 NTC temperature"
+      },
+      "alfa_7_temperature": {
+        "name": "ALFA 7 temperature"
+      },
+      "alfa_8_address": {
+        "name": "ALFA 8 bus address"
+      },
+      "alfa_8_co2": {
+        "name": "ALFA 8 CO2"
+      },
+      "alfa_8_humidity": {
+        "name": "ALFA 8 humidity"
+      },
+      "alfa_8_ntc_temperature": {
+        "name": "ALFA 8 NTC temperature"
+      },
+      "alfa_8_temperature": {
+        "name": "ALFA 8 temperature"
+      },
+      "away_begin_at": {
+        "name": "Away begins"
+      },
+      "away_end_at": {
+        "name": "Away ends"
+      },
+      "boost_button_count": {
+        "name": "Boost buttons"
+      },
+      "boost_timer": {
+        "name": "Boost remaining"
+      },
+      "build_number": {
+        "name": "Build number"
+      },
+      "circulation_timer": {
+        "name": "Circulation remaining"
+      },
+      "co2_max": {
+        "name": "Highest CO2"
+      },
+      "connected_coolbreeze": {
+        "name": "CoolBreeze connected"
+      },
+      "device_id": {
+        "name": "Device ID"
+      },
+      "ext_button_1_timer": {
+        "name": "External button 1 timer"
+      },
+      "ext_button_2_timer": {
+        "name": "External button 2 timer"
+      },
+      "ext_button_3_timer": {
+        "name": "External button 3 timer"
+      },
+      "ext_button_4_timer": {
+        "name": "External button 4 timer"
+      },
+      "ext_button_5_timer": {
+        "name": "External button 5 timer"
+      },
+      "ext_button_6_timer": {
+        "name": "External button 6 timer"
+      },
+      "ext_button_7_timer": {
+        "name": "External button 7 timer"
+      },
+      "ext_button_8_timer": {
+        "name": "External button 8 timer"
+      },
+      "ext_sensor_1_co2": {
+        "name": "External sensor 1 CO2"
+      },
+      "ext_sensor_1_floor_temperature": {
+        "name": "External sensor 1 floor temperature"
+      },
+      "ext_sensor_1_humidity": {
+        "name": "External sensor 1 humidity"
+      },
+      "ext_sensor_1_temperature": {
+        "name": "External sensor 1 temperature"
+      },
+      "ext_sensor_2_co2": {
+        "name": "External sensor 2 CO2"
+      },
+      "ext_sensor_2_floor_temperature": {
+        "name": "External sensor 2 floor temperature"
+      },
+      "ext_sensor_2_humidity": {
+        "name": "External sensor 2 humidity"
+      },
+      "ext_sensor_2_temperature": {
+        "name": "External sensor 2 temperature"
+      },
+      "ext_sensor_3_co2": {
+        "name": "External sensor 3 CO2"
+      },
+      "ext_sensor_3_floor_temperature": {
+        "name": "External sensor 3 floor temperature"
+      },
+      "ext_sensor_3_humidity": {
+        "name": "External sensor 3 humidity"
+      },
+      "ext_sensor_3_temperature": {
+        "name": "External sensor 3 temperature"
+      },
+      "ext_sensor_4_co2": {
+        "name": "External sensor 4 CO2"
+      },
+      "ext_sensor_4_floor_temperature": {
+        "name": "External sensor 4 floor temperature"
+      },
+      "ext_sensor_4_humidity": {
+        "name": "External sensor 4 humidity"
+      },
+      "ext_sensor_4_temperature": {
+        "name": "External sensor 4 temperature"
+      },
+      "ext_sensor_5_co2": {
+        "name": "External sensor 5 CO2"
+      },
+      "ext_sensor_5_floor_temperature": {
+        "name": "External sensor 5 floor temperature"
+      },
+      "ext_sensor_5_humidity": {
+        "name": "External sensor 5 humidity"
+      },
+      "ext_sensor_5_temperature": {
+        "name": "External sensor 5 temperature"
+      },
+      "ext_sensor_6_co2": {
+        "name": "External sensor 6 CO2"
+      },
+      "ext_sensor_6_floor_temperature": {
+        "name": "External sensor 6 floor temperature"
+      },
+      "ext_sensor_6_humidity": {
+        "name": "External sensor 6 humidity"
+      },
+      "ext_sensor_6_temperature": {
+        "name": "External sensor 6 temperature"
+      },
+      "ext_sensor_7_co2": {
+        "name": "External sensor 7 CO2"
+      },
+      "ext_sensor_7_floor_temperature": {
+        "name": "External sensor 7 floor temperature"
+      },
+      "ext_sensor_7_humidity": {
+        "name": "External sensor 7 humidity"
+      },
+      "ext_sensor_7_temperature": {
+        "name": "External sensor 7 temperature"
+      },
+      "ext_sensor_8_co2": {
+        "name": "External sensor 8 CO2"
+      },
+      "ext_sensor_8_floor_temperature": {
+        "name": "External sensor 8 floor temperature"
+      },
+      "ext_sensor_8_humidity": {
+        "name": "External sensor 8 humidity"
+      },
+      "ext_sensor_8_temperature": {
+        "name": "External sensor 8 temperature"
+      },
+      "external_button_count": {
+        "name": "External buttons"
+      },
+      "external_sensor_count": {
+        "name": "External sensors"
+      },
+      "fan_pwm_exhaust": {
+        "name": "Exhaust fan output"
+      },
+      "fan_pwm_supply": {
+        "name": "Supply fan output"
+      },
+      "fan_rpm_exhaust": {
+        "name": "Exhaust fan speed"
+      },
+      "fan_rpm_supply": {
+        "name": "Supply fan speed"
+      },
+      "filter_wear": {
+        "name": "Filter clogging"
+      },
+      "firmware": {
+        "name": "Firmware version"
+      },
+      "heat_recovered": {
+        "name": "Heat recovered"
+      },
+      "heating_power": {
+        "name": "Post-heater power"
+      },
+      "humidity_ambient": {
+        "name": "Outside air humidity"
+      },
+      "humidity_fresh": {
+        "name": "Supply air humidity"
+      },
+      "humidity_indoor": {
+        "name": "Extract air humidity"
+      },
+      "humidity_mean_indoor": {
+        "name": "Indoor humidity"
+      },
+      "humidity_waste": {
+        "name": "Exhaust air humidity"
+      },
+      "hw_revision": {
+        "name": "Hardware revision"
+      },
+      "mac_address": {
+        "name": "MAC address"
+      },
+      "model": {
+        "name": "Model"
+      },
+      "night_timer": {
+        "name": "Night mode remaining"
+      },
+      "overpressure_timer": {
+        "name": "Overpressure remaining"
+      },
+      "party_timer": {
+        "name": "Party mode remaining"
+      },
+      "performance_factor": {
+        "name": "Performance factor"
+      },
+      "power_consumption": {
+        "name": "Power consumption"
+      },
+      "regmap_version": {
+        "name": "Register map version"
+      },
+      "rtc_battery_voltage": {
+        "name": "RTC battery voltage"
+      },
+      "serial_number": {
+        "name": "Serial number"
+      },
+      "stat_fails": {
+        "name": "Modbus failures"
+      },
+      "stat_reads": {
+        "name": "Modbus reads"
+      },
+      "stat_writes": {
+        "name": "Modbus writes"
+      },
+      "temp_ambient": {
+        "name": "Outside air temperature"
+      },
+      "temp_fresh": {
+        "name": "Supply air temperature"
+      },
+      "temp_indoor": {
+        "name": "Extract air temperature"
+      },
+      "temp_mean_indoor": {
+        "name": "Indoor temperature"
+      },
+      "temp_outdoor_ntc": {
+        "name": "Outdoor temperature"
+      },
+      "temp_waste": {
+        "name": "Exhaust air temperature"
+      },
+      "uin1_voltage": {
+        "name": "Input UIN1 voltage"
+      },
+      "uin2_voltage": {
+        "name": "Input UIN2 voltage"
+      },
+      "valve_count_exhaust": {
+        "name": "Exhaust valves"
+      },
+      "valve_count_supply": {
+        "name": "Supply valves"
+      },
+      "variant": {
+        "name": "Model variant"
+      },
+      "ventilation_text": {
+        "name": "Ventilation mode"
+      },
+      "wall_sensor_1_address": {
+        "name": "CO2 sensor 1 bus address"
+      },
+      "wall_sensor_1_co2": {
+        "name": "CO2 sensor 1 CO2"
+      },
+      "wall_sensor_1_humidity": {
+        "name": "CO2 sensor 1 humidity"
+      },
+      "wall_sensor_1_temperature": {
+        "name": "CO2 sensor 1 temperature"
+      },
+      "wall_sensor_2_address": {
+        "name": "CO2 sensor 2 bus address"
+      },
+      "wall_sensor_2_co2": {
+        "name": "CO2 sensor 2 CO2"
+      },
+      "wall_sensor_2_humidity": {
+        "name": "CO2 sensor 2 humidity"
+      },
+      "wall_sensor_2_temperature": {
+        "name": "CO2 sensor 2 temperature"
+      },
+      "wall_sensor_3_address": {
+        "name": "CO2 sensor 3 bus address"
+      },
+      "wall_sensor_3_co2": {
+        "name": "CO2 sensor 3 CO2"
+      },
+      "wall_sensor_3_humidity": {
+        "name": "CO2 sensor 3 humidity"
+      },
+      "wall_sensor_3_temperature": {
+        "name": "CO2 sensor 3 temperature"
+      },
+      "wall_sensor_4_address": {
+        "name": "CO2 sensor 4 bus address"
+      },
+      "wall_sensor_4_co2": {
+        "name": "CO2 sensor 4 CO2"
+      },
+      "wall_sensor_4_humidity": {
+        "name": "CO2 sensor 4 humidity"
+      },
+      "wall_sensor_4_temperature": {
+        "name": "CO2 sensor 4 temperature"
+      },
+      "wall_sensor_5_address": {
+        "name": "CO2 sensor 5 bus address"
+      },
+      "wall_sensor_5_co2": {
+        "name": "CO2 sensor 5 CO2"
+      },
+      "wall_sensor_5_humidity": {
+        "name": "CO2 sensor 5 humidity"
+      },
+      "wall_sensor_5_temperature": {
+        "name": "CO2 sensor 5 temperature"
+      },
+      "wall_sensor_6_address": {
+        "name": "CO2 sensor 6 bus address"
+      },
+      "wall_sensor_6_co2": {
+        "name": "CO2 sensor 6 CO2"
+      },
+      "wall_sensor_6_humidity": {
+        "name": "CO2 sensor 6 humidity"
+      },
+      "wall_sensor_6_temperature": {
+        "name": "CO2 sensor 6 temperature"
+      },
+      "wall_sensor_7_address": {
+        "name": "CO2 sensor 7 bus address"
+      },
+      "wall_sensor_7_co2": {
+        "name": "CO2 sensor 7 CO2"
+      },
+      "wall_sensor_7_humidity": {
+        "name": "CO2 sensor 7 humidity"
+      },
+      "wall_sensor_7_temperature": {
+        "name": "CO2 sensor 7 temperature"
+      },
+      "wall_sensor_8_address": {
+        "name": "CO2 sensor 8 bus address"
+      },
+      "wall_sensor_8_co2": {
+        "name": "CO2 sensor 8 CO2"
+      },
+      "wall_sensor_8_humidity": {
+        "name": "CO2 sensor 8 humidity"
+      },
+      "wall_sensor_8_temperature": {
+        "name": "CO2 sensor 8 temperature"
+      },
+      "wall_ui_1_address": {
+        "name": "Wall controller 1 bus address"
+      },
+      "wall_ui_1_co2": {
+        "name": "Wall controller 1 CO2"
+      },
+      "wall_ui_1_humidity": {
+        "name": "Wall controller 1 humidity"
+      },
+      "wall_ui_1_temperature": {
+        "name": "Wall controller 1 temperature"
+      },
+      "wall_ui_2_address": {
+        "name": "Wall controller 2 bus address"
+      },
+      "wall_ui_2_co2": {
+        "name": "Wall controller 2 CO2"
+      },
+      "wall_ui_2_humidity": {
+        "name": "Wall controller 2 humidity"
+      },
+      "wall_ui_2_temperature": {
+        "name": "Wall controller 2 temperature"
+      },
+      "wall_ui_3_address": {
+        "name": "Wall controller 3 bus address"
+      },
+      "wall_ui_3_co2": {
+        "name": "Wall controller 3 CO2"
+      },
+      "wall_ui_3_humidity": {
+        "name": "Wall controller 3 humidity"
+      },
+      "wall_ui_3_temperature": {
+        "name": "Wall controller 3 temperature"
+      }
+    },
+    "switch": {
+      "antiradon": {
+        "name": "Radon protection"
+      },
+      "bypass_enable": {
+        "name": "Automatic bypass"
+      },
+      "comfort_enable": {
+        "name": "Comfort temperature control"
+      },
+      "cooling_enable": {
+        "name": "Additional cooling"
+      },
+      "ext_button_1_active": {
+        "name": "External button 1 active"
+      },
+      "ext_button_1_present": {
+        "name": "External button 1 present"
+      },
+      "ext_button_2_active": {
+        "name": "External button 2 active"
+      },
+      "ext_button_2_present": {
+        "name": "External button 2 present"
+      },
+      "ext_button_3_active": {
+        "name": "External button 3 active"
+      },
+      "ext_button_3_present": {
+        "name": "External button 3 present"
+      },
+      "ext_button_4_active": {
+        "name": "External button 4 active"
+      },
+      "ext_button_4_present": {
+        "name": "External button 4 present"
+      },
+      "ext_button_5_active": {
+        "name": "External button 5 active"
+      },
+      "ext_button_5_present": {
+        "name": "External button 5 present"
+      },
+      "ext_button_6_active": {
+        "name": "External button 6 active"
+      },
+      "ext_button_6_present": {
+        "name": "External button 6 present"
+      },
+      "ext_button_7_active": {
+        "name": "External button 7 active"
+      },
+      "ext_button_7_present": {
+        "name": "External button 7 present"
+      },
+      "ext_button_8_active": {
+        "name": "External button 8 active"
+      },
+      "ext_button_8_present": {
+        "name": "External button 8 present"
+      },
+      "ext_sensor_1_present": {
+        "name": "External sensor 1 present"
+      },
+      "ext_sensor_2_present": {
+        "name": "External sensor 2 present"
+      },
+      "ext_sensor_3_present": {
+        "name": "External sensor 3 present"
+      },
+      "ext_sensor_4_present": {
+        "name": "External sensor 4 present"
+      },
+      "ext_sensor_5_present": {
+        "name": "External sensor 5 present"
+      },
+      "ext_sensor_6_present": {
+        "name": "External sensor 6 present"
+      },
+      "ext_sensor_7_present": {
+        "name": "External sensor 7 present"
+      },
+      "ext_sensor_8_present": {
+        "name": "External sensor 8 present"
+      },
+      "heating_enable": {
+        "name": "Additional heating"
+      },
+      "kitchenhood_normally_open": {
+        "name": "Kitchen hood normally open"
+      },
+      "time_program": {
+        "name": "Schedule"
       }
     }
   }

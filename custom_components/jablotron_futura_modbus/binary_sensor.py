@@ -46,6 +46,8 @@ def _descriptions() -> list[BinarySensorEntityDescription]:
         out.append(
             BinarySensorEntityDescription(
                 key=f"mode_{name}",
+
+                translation_key=f"mode_{name}",
                 name=name.replace("_", " ").capitalize(),
                 icon=_MODE_ICONS.get(name),
             )
@@ -54,6 +56,8 @@ def _descriptions() -> list[BinarySensorEntityDescription]:
         out.append(
             BinarySensorEntityDescription(
                 key=f"error_{name}",
+
+                translation_key=f"error_{name}",
                 name=f"Error: {name.replace('_', ' ')}",
                 device_class=BinarySensorDeviceClass.PROBLEM,
                 entity_registry_enabled_default=False,
@@ -63,6 +67,8 @@ def _descriptions() -> list[BinarySensorEntityDescription]:
         out.append(
             BinarySensorEntityDescription(
                 key=f"warning_{name}",
+
+                translation_key=f"warning_{name}",
                 name=f"Warning: {name.replace('_', ' ')}",
                 device_class=BinarySensorDeviceClass.PROBLEM,
                 entity_registry_enabled_default=False,
@@ -72,6 +78,8 @@ def _descriptions() -> list[BinarySensorEntityDescription]:
         out.append(
             BinarySensorEntityDescription(
                 key=f"config_{name}",
+
+                translation_key=f"config_{name}",
                 name=f"Supports {name.replace('_', ' ')}",
                 entity_category=EntityCategory.DIAGNOSTIC,
                 entity_registry_enabled_default=False,
@@ -81,6 +89,8 @@ def _descriptions() -> list[BinarySensorEntityDescription]:
         out.append(
             BinarySensorEntityDescription(
                 key=f"input_{name}",
+
+                translation_key=f"input_{name}",
                 name=f"Input {name.replace('_', ' ')}",
                 entity_category=EntityCategory.DIAGNOSTIC,
                 entity_registry_enabled_default=False,
@@ -90,11 +100,15 @@ def _descriptions() -> list[BinarySensorEntityDescription]:
     out += [
         BinarySensorEntityDescription(
             key="any_error",
+
+            translation_key="any_error",
             name="Fault",
             device_class=BinarySensorDeviceClass.PROBLEM,
         ),
         BinarySensorEntityDescription(
             key="any_warning",
+
+            translation_key="any_warning",
             name="Warning",
             device_class=BinarySensorDeviceClass.PROBLEM,
         ),

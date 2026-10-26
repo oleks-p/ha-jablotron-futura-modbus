@@ -81,6 +81,12 @@ def _describe(reg: Reg) -> SensorEntityDescription:
         category = EntityCategory.CONFIG
     return SensorEntityDescription(
         key=reg.key,
+        # Both, deliberately. `translation_key` is what Home Assistant looks up,
+        # and `name` stays as the English source that tools/gen_translations.py
+        # writes into strings.json -- so the English text lives next to the
+        # register it names, and a missing translation falls back to it rather
+        # than leaving the entity unnamed.
+        translation_key=reg.key,
         name=reg.name or reg.key.replace("_", " ").capitalize(),
         native_unit_of_measurement=reg.unit,
         device_class=_DEVICE_CLASSES.get(reg.device_class or ""),
@@ -94,12 +100,16 @@ def _describe(reg: Reg) -> SensorEntityDescription:
 DERIVED: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
         key="performance_factor",
+
+        translation_key="performance_factor",
         name="Performance factor",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:chart-line",
     ),
     SensorEntityDescription(
         key="temp_mean_indoor",
+
+        translation_key="temp_mean_indoor",
         name="Indoor temperature",
         native_unit_of_measurement="°C",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -107,6 +117,8 @@ DERIVED: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key="humidity_mean_indoor",
+
+        translation_key="humidity_mean_indoor",
         name="Indoor humidity",
         native_unit_of_measurement="%",
         device_class=SensorDeviceClass.HUMIDITY,
@@ -114,6 +126,8 @@ DERIVED: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key="co2_max",
+
+        translation_key="co2_max",
         name="Highest CO2",
         native_unit_of_measurement="ppm",
         device_class=SensorDeviceClass.CO2,
@@ -121,6 +135,8 @@ DERIVED: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key="air_quality",
+
+        translation_key="air_quality",
         name="Air quality",
         device_class=SensorDeviceClass.ENUM,
         options=["good", "moderate", "poor"],
@@ -128,6 +144,8 @@ DERIVED: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key="ventilation_text",
+
+        translation_key="ventilation_text",
         name="Ventilation mode",
         device_class=SensorDeviceClass.ENUM,
         options=["off", "1", "2", "3", "4", "5", "auto"],
@@ -135,18 +153,24 @@ DERIVED: tuple[SensorEntityDescription, ...] = (
     ),
     SensorEntityDescription(
         key="away_begin_at",
+
+        translation_key="away_begin_at",
         name="Away begins",
         device_class=SensorDeviceClass.TIMESTAMP,
         icon="mdi:bag-suitcase",
     ),
     SensorEntityDescription(
         key="away_end_at",
+
+        translation_key="away_end_at",
         name="Away ends",
         device_class=SensorDeviceClass.TIMESTAMP,
         icon="mdi:bag-suitcase-off",
     ),
     SensorEntityDescription(
         key="model",
+
+        translation_key="model",
         name="Model",
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:information-outline",
@@ -176,6 +200,8 @@ SLOT_COUNTS: tuple[FuturaSlotCountDescription, ...] = (
     # are fitted -- no per-button state -- so a count is all there is to show.
     FuturaSlotCountDescription(
         key="boost_button_count",
+
+        translation_key="boost_button_count",
         name="Boost buttons",
         icon="mdi:gesture-tap-button",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -187,6 +213,8 @@ SLOT_COUNTS: tuple[FuturaSlotCountDescription, ...] = (
     # own entities; these say how many there are, including when it is none.
     FuturaSlotCountDescription(
         key="external_sensor_count",
+
+        translation_key="external_sensor_count",
         name="External sensors",
         icon="mdi:thermometer-lines",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -196,6 +224,8 @@ SLOT_COUNTS: tuple[FuturaSlotCountDescription, ...] = (
     ),
     FuturaSlotCountDescription(
         key="external_button_count",
+
+        translation_key="external_button_count",
         name="External buttons",
         icon="mdi:gesture-tap-button",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -281,6 +311,7 @@ class FuturaValveCountSensor(FuturaEntity, SensorEntity):
             coordinator,
             SensorEntityDescription(
                 key=f"valve_count_{side}",
+                translation_key=f"valve_count_{side}",
                 name=label,
                 state_class=SensorStateClass.MEASUREMENT,
             ),
