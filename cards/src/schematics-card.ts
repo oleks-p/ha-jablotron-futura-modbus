@@ -15,8 +15,9 @@
  * card's settings and onto the dashboard, which is the difference between looking
  * at another view and editing a dashboard to look at another view.
  */
-import { LitElement, type PropertyDeclarations, css, html, type TemplateResult } from 'lit';
+import { LitElement, type PropertyDeclarations, css, html, nothing, type TemplateResult } from 'lit';
 import { type Hass, errorRow } from './shared';
+import { text, type StringKey } from './i18n';
 
 export interface SchematicsCardConfig {
   type: string;
@@ -34,15 +35,20 @@ export type Variant = 'flow' | 'unit' | 'service' | 'diagram';
 
 interface VariantSpec {
   tag: string;
-  label: string;
+  label: StringKey;
   /**
    * What an `input_select` option should read, and what its state is matched
    * against. Shorter than `label`, whose parenthetical belongs in a settings
    * dropdown and not in a helper's options.
+   *
+   * Matching is against the English wording as well as the translated one, so a
+   * helper written in English keeps working on a frontend in another language --
+   * and so does one written in that language. The integration's own select
+   * reports the variant key, which matches whatever the frontend's language is.
    */
-  option: string;
+  option: StringKey;
   /** One line on what this view is for, shown under the picker. */
-  hint: string;
+  hint: StringKey;
 }
 
 /**
@@ -51,28 +57,28 @@ interface VariantSpec {
  */
 export const VARIANTS: Record<Variant, VariantSpec> = {
   flow: {
-    option: 'Air flow',
+    option: 'variantFlow',
     tag: 'futura-flow-card',
-    label: 'Air flow (app screen)',
-    hint: 'The mobile app\'s air-quality screen: glowing ribbons, air quality and filter.',
+    label: 'variantFlowLabel',
+    hint: 'variantFlowHint',
   },
   unit: {
-    option: 'Unit schematic',
+    option: 'variantUnit',
     tag: 'futura-unit-card',
-    label: 'Unit schematic',
-    hint: 'The casing at its real proportions, one full-bore duct per flange.',
+    label: 'variantUnitLabel',
+    hint: 'variantUnitHint',
   },
   service: {
-    option: 'Service schematic',
+    option: 'variantService',
     tag: 'futura-schematic-card',
-    label: 'Service schematic',
-    hint: 'Flow direction per duct, both fan speeds, filter wear.',
+    label: 'variantServiceLabel',
+    hint: 'variantServiceHint',
   },
   diagram: {
-    option: 'Airflow diagram',
+    option: 'variantDiagram',
     tag: 'futura-diagram-card',
-    label: 'Airflow diagram (line drawing)',
-    hint: 'The manual\'s process diagram: runs, bypass, fans and the exchanger.',
+    label: 'variantDiagramLabel',
+    hint: 'variantDiagramHint',
   },
 };
 
@@ -160,10 +166,22 @@ export class FuturaSchematicsCard extends LitElement {
    * falling back silently would leave a mistyped option looking like a card that
    * ignores its helper.
    */
-  private static match(state: string): Variant | undefined {
-    const key = state.toLowerCase().replace(/[^a-z]/g, '');
+  private static normalise(state: string): string {
+    // Letters and digits in any script: the option labels are translated, and
+    // an ASCII-only strip would reduce a Ukrainian option to nothing and match
+    // every variant at once.
+    return state.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+  }
+
+  private match(state: string): Variant | undefined {
+    const key = FuturaSchematicsCard.normalise(state);
+    const same = (option: StringKey, hass: Hass | undefined) =>
+      FuturaSchematicsCard.normalise(text(hass, option)) === key;
+    // `undefined` for hass is the English table: a helper written in English
+    // keeps working after the frontend is switched to another language.
     return (Object.keys(VARIANTS) as Variant[]).find(
-      (v) => v === key || VARIANTS[v].option.toLowerCase().replace(/[^a-z]/g, '') === key,
+      (v) => v === key || same(VARIANTS[v].option, this._hass)
+        || same(VARIANTS[v].option, undefined),
     );
   }
 
@@ -190,7 +208,7 @@ export class FuturaSchematicsCard extends LitElement {
     if (state === undefined || state === 'unavailable' || state === 'unknown') {
       return undefined;
     }
-    return FuturaSchematicsCard.match(state);
+    return this.match(state);
   }
 
   /** Set when the helper is missing or pointing at something unrecognised. */
@@ -198,12 +216,19 @@ export class FuturaSchematicsCard extends LitElement {
     const entity = this.config.variant_entity;
     if (!entity) return undefined;
     const state = this.helperState;
-    if (state === undefined) return `Entity ${entity} not found.`;
+    if (state === undefined) {
+      return text(this._hass, 'entityMissing', { entity });
+    }
     // Startup states, not mistakes: fall through to the configured variant.
     if (state === 'unavailable' || state === 'unknown') return undefined;
-    if (FuturaSchematicsCard.match(state)) return undefined;
-    return `${entity} is "${state}", which is not one of: `
-      + `${Object.values(VARIANTS).map((v) => v.option).join(', ')}.`;
+    if (this.match(state)) return undefined;
+    return text(this._hass, 'optionUnknown', {
+      entity,
+      state,
+      options: Object.values(VARIANTS)
+        .map((v) => text(this._hass, v.option))
+        .join(', '),
+    });
   }
 
   /** Delegated, so a masonry column still leaves the right amount of room. */
@@ -235,7 +260,7 @@ export class FuturaSchematicsCard extends LitElement {
     const card = this.card;
     if (!card) {
       return html`<ha-card>
-        ${errorRow(`Card ${VARIANTS[this.variant].tag} is not registered.`)}
+        ${errorRow(text(this._hass, 'cardMissing', { tag: VARIANTS[this.variant].tag }))}
       </ha-card>`;
     }
     return html`${card}`;
@@ -274,7 +299,7 @@ export class FuturaSchematicsCardEditor extends LitElement {
     this.config = { ...config };
   }
 
-  private static get schema() {
+  private get schema() {
     return [
       {
         name: 'variant',
@@ -283,7 +308,7 @@ export class FuturaSchematicsCardEditor extends LitElement {
             mode: 'dropdown',
             options: Object.entries(VARIANTS).map(([value, spec]) => ({
               value,
-              label: spec.label,
+              label: text(this.hass, spec.label),
             })),
           },
         },
@@ -297,14 +322,20 @@ export class FuturaSchematicsCardEditor extends LitElement {
     ];
   }
 
-  private static label(entry: { name: string }): string {
-    return {
-      variant: 'Schematic',
-      variant_entity: 'Or choose it from this helper',
-      prefix: 'Entity prefix',
-      title: 'Card title',
-    }[entry.name] ?? entry.name;
-  }
+  /**
+   * Bound, not static: `ha-form` calls it as a bare function, so it has to
+   * carry the editor with it to reach `hass` and translate.
+   */
+  private readonly label = (entry: { name: string }): string => {
+    const key: Record<string, StringKey> = {
+      variant: 'editorVariant',
+      variant_entity: 'editorVariantEntity',
+      prefix: 'editorPrefix',
+      title: 'editorTitle',
+    };
+    const name = key[entry.name];
+    return name ? text(this.hass, name) : entry.name;
+  };
 
   private changed(event: CustomEvent): void {
     event.stopPropagation();
@@ -329,11 +360,13 @@ export class FuturaSchematicsCardEditor extends LitElement {
       <ha-form
         .hass=${this.hass}
         .data=${{ variant, ...this.config }}
-        .schema=${FuturaSchematicsCardEditor.schema}
-        .computeLabel=${FuturaSchematicsCardEditor.label}
+        .schema=${this.schema}
+        .computeLabel=${this.label}
         @value-changed=${this.changed}
       ></ha-form>
-      <div class="hint">${VARIANTS[variant]?.hint}</div>
+      <div class="hint">
+        ${VARIANTS[variant] ? text(this.hass, VARIANTS[variant].hint) : nothing}
+      </div>
     `;
   }
 }

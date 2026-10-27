@@ -19,6 +19,7 @@
  */
 import { LitElement, type PropertyDeclarations, css, html, nothing, svg, type TemplateResult } from 'lit';
 import { type Hass, DEFAULT_PREFIX, cssVal, errorRow, num, sharedStyles } from './shared';
+import { text, type StringKey } from './i18n';
 import * as t from './tokens';
 import { evenPitch, hatchSeam, makeShell } from './unit-shell';
 
@@ -118,7 +119,8 @@ const RUN_START_INSET = 20;
 interface Duct {
   /** Flange letter from the installation manual. */
   flange: 'A' | 'B' | 'C' | 'D';
-  label: string;
+  /** Looked up at render time, so the pill follows the frontend's language. */
+  label: StringKey;
   temp: string;
   humidity: string;
   colour: string;
@@ -137,22 +139,22 @@ interface Duct {
  */
 const DUCTS: Duct[] = [
   {
-    flange: 'A', label: 'Outside air',
+    flange: 'A', label: 'ductOutside',
     temp: 'outside_air_temperature', humidity: 'outside_air_humidity',
     colour: t.DUCT.outside, collar: 0, row: 0,
   },
   {
-    flange: 'B', label: 'Waste air',
+    flange: 'B', label: 'ductWaste',
     temp: 'exhaust_air_temperature', humidity: 'exhaust_air_humidity',
     colour: t.DUCT.waste, collar: 1, row: 1,
   },
   {
-    flange: 'C', label: 'Fresh air',
+    flange: 'C', label: 'ductFresh',
     temp: 'supply_air_temperature', humidity: 'supply_air_humidity',
     colour: t.DUCT.fresh, collar: 2, row: 0,
   },
   {
-    flange: 'D', label: 'Inside air',
+    flange: 'D', label: 'ductInside',
     temp: 'extract_air_temperature', humidity: 'extract_air_humidity',
     colour: t.DUCT.inside, collar: 3, row: 1,
   },
@@ -298,7 +300,7 @@ export class FuturaUnitCard extends LitElement {
         style=${`left:${(cx / W) * 100}%;`
           + `top:${((ROW_Y[duct.row] - VIEW.y) / VIEW.h) * 100}%`}
       >
-        <span class="name">${duct.label}</span>
+        <span class="name">${text(this.hass, duct.label)}</span>
         <span class="row">
           <ha-icon icon="mdi:thermometer" style=${`color:${duct.colour}`}></ha-icon>
           ${FuturaUnitCard.decimal(this.reading(duct.temp))} °C
@@ -375,7 +377,9 @@ export class FuturaUnitCard extends LitElement {
     if (!this.hass) return html`<ha-card></ha-card>`;
     const probe = `${this.entityPrefix}_outside_air_temperature`;
     if (!this.hass.states[probe]) {
-      return html`<ha-card>${errorRow(`Entity ${probe} not found.`)}</ha-card>`;
+      return html`<ha-card>
+        ${errorRow(text(this.hass, 'entityMissing', { entity: probe }))}
+      </ha-card>`;
     }
 
     return html`
@@ -385,7 +389,7 @@ export class FuturaUnitCard extends LitElement {
           : nothing}
         <div class="stage">
           <svg viewBox="0 ${VIEW.y} ${W} ${VIEW.h}" role="img"
-               aria-label="Ventilation unit, duct temperatures and humidity">
+               aria-label=${text(this.hass, 'ariaUnit')}>
             <!-- collars first, then the runs over them: the dots land on the
                  collar as they do on the app's screen. The casing comes after
                  both and hides whatever crosses its edge. -->

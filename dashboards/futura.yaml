@@ -11,6 +11,14 @@
 #
 # Sections are deliberately kept small: the sections view balances them across
 # columns, so one very tall section would otherwise leave the other column empty.
+#
+# No tile carries a `name:`. Each entity's name is written once, in the register
+# table, and Home Assistant hands it over in the frontend's language -- an
+# override here would be that name again, in English, on every install. The text
+# that is left is this file's own: headings, chart titles and the names on chart
+# series. `tools/localise_dashboard.py` translates those into
+# `futura.<lang>.yaml`, which is what to deploy for a dashboard in another
+# language.
 views:
   - title: Futura
     path: futura
@@ -53,7 +61,6 @@ views:
           # to open the dialog; four buttons in a row are worth the width.
           - type: tile
             entity: select.jablotron_futura_schematic
-            name: Schematic
             icon: mdi:vector-square
             features:
               - type: select-options
@@ -61,7 +68,6 @@ views:
               columns: full
           - type: custom:futura-control-card
             prefix: sensor.jablotron_futura
-            title: Controls
 
       - type: grid
         cards:
@@ -70,30 +76,22 @@ views:
             heading_style: subtitle
           - type: tile
             entity: sensor.jablotron_futura_power_consumption
-            name: Power
           - type: tile
             entity: sensor.jablotron_futura_heat_recovered
-            name: Recovered
           - type: tile
             entity: sensor.jablotron_futura_air_flow
-            name: Air flow
           # The indoor mean and humidity mean are not repeated here: the flow
           # card already prints both, and the climate entity headlines them.
           - type: tile
             entity: sensor.jablotron_futura_outdoor_temperature
-            name: Outdoor probe
           - type: tile
             entity: sensor.jablotron_futura_supply_fan_speed
-            name: Supply fan
           - type: tile
             entity: sensor.jablotron_futura_exhaust_fan_speed
-            name: Exhaust fan
           - type: tile
             entity: sensor.jablotron_futura_supply_fan_output
-            name: Supply fan output
           - type: tile
             entity: sensor.jablotron_futura_exhaust_fan_output
-            name: Exhaust fan output
 
 
       - type: grid
@@ -111,22 +109,16 @@ views:
           # installed.
           - type: tile
             entity: switch.jablotron_futura_schedule         # holding 12
-            name: Schedule
           - type: tile
             entity: switch.jablotron_futura_radon_protection  # holding 13
-            name: Radon protection
           - type: tile
             entity: switch.jablotron_futura_automatic_bypass  # holding 14
-            name: Automatic bypass
           - type: tile
             entity: switch.jablotron_futura_additional_heating  # holding 15
-            name: Additional heating
           - type: tile
             entity: switch.jablotron_futura_additional_cooling  # holding 16
-            name: Additional cooling
           - type: tile
             entity: switch.jablotron_futura_comfort_temperature_control  # 17
-            name: Comfort temperature control
           # A select, not a switch: 0 = temperature, 1 = CO2. No select-options
           # feature, so it stays one row and one column like its neighbours --
           # the current option shows as the tile's state, and a tap opens the
@@ -136,10 +128,8 @@ views:
           # any grid_options set here.
           - type: tile
             entity: select.jablotron_futura_zone_auto_priority  # holding 20
-            name: Zone auto priority
           - type: tile
             entity: switch.jablotron_futura_kitchen_hood_normally_open  # 21
-            name: Kitchen hood normally open
 
 
       # Only appears when something is actually wrong.

@@ -19,6 +19,7 @@
  */
 import { LitElement, type PropertyDeclarations, css, html, nothing, svg, type TemplateResult } from 'lit';
 import { type Hass, DEFAULT_PREFIX, cssVal, errorRow, num, sharedStyles } from './shared';
+import { text } from './i18n';
 import * as t from './tokens';
 import { type Shell, hatchSeam, makeShell } from './unit-shell';
 
@@ -398,7 +399,7 @@ export class FuturaDiagramCard extends LitElement {
    * Each run carries its own duct's colour, flat -- no gradient. The exchanger and
    * the fan bodies stay neutral, because they contain air rather than carry it.
    */
-  private static flow(): TemplateResult {
+  private static flow(hass: Hass | undefined): TemplateResult {
     const [xa, xb, xc, xd] = SHELL.collarX;
     const { top, mid, bottom, point, shoulder } = EXCH;
     const centre = BODY.x + BODY.w / 2;
@@ -463,7 +464,8 @@ export class FuturaDiagramCard extends LitElement {
       ${dot(xc, C.colour)}
       <text x=${damper} y=${BYPASS_Y + Math.round(BODY.w * 0.048)}
             text-anchor="middle" font-size=${Math.round(BODY.w * 0.027)}
-            letter-spacing="1.1" fill=${LINE} fill-opacity=${OP.label}>BYPASS</text>
+            letter-spacing="1.1" fill=${LINE}
+            fill-opacity=${OP.label}>${text(hass, 'bypass')}</text>
 
       <!-- the exchanger, and the crossing that names it -->
       <g fill="none" stroke=${LINE} stroke-linecap="round" stroke-linejoin="round">
@@ -510,7 +512,9 @@ export class FuturaDiagramCard extends LitElement {
     if (!this.hass) return html`<ha-card></ha-card>`;
     const probe = `${this.entityPrefix}_outside_air_temperature`;
     if (!this.hass.states[probe]) {
-      return html`<ha-card>${errorRow(`Entity ${probe} not found.`)}</ha-card>`;
+      return html`<ha-card>
+        ${errorRow(text(this.hass, 'entityMissing', { entity: probe }))}
+      </ha-card>`;
     }
 
     return html`
@@ -521,10 +525,10 @@ export class FuturaDiagramCard extends LitElement {
         <div class="stage">
           <div class="labels">${DUCTS.map((duct) => this.pill(duct))}</div>
           <svg viewBox="0 0 ${W} ${H}" role="img"
-               aria-label="Ventilation unit airflow diagram with duct readings">
+               aria-label=${text(this.hass, 'ariaDiagram')}>
             ${DUCTS.map((duct) => FuturaDiagramCard.arrow(duct))}
             ${FuturaDiagramCard.casing()}
-            ${FuturaDiagramCard.flow()}
+            ${FuturaDiagramCard.flow(this.hass)}
           </svg>
         </div>
       </ha-card>

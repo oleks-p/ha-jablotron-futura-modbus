@@ -17,6 +17,7 @@ import {
   sharedStyles,
   shortName,
 } from './shared';
+import { text } from './i18n';
 
 export interface SensorGridConfig {
   type: string;
@@ -152,10 +153,10 @@ export class FuturaSensorGridCard extends LitElement {
       <ha-card>
         <div class="head">
           <ha-icon icon=${metric.icon}></ha-icon>
-          ${this.config.title ?? metric.label}
+          ${this.config.title ?? text(this.hass, metric.label)}
         </div>
         ${tiles.length === 0
-          ? html`<div class="empty">No peripheral sensors reporting.</div>`
+          ? html`<div class="empty">${text(this.hass, 'noSensors')}</div>`
           : html`
               <div
                 class="grid"

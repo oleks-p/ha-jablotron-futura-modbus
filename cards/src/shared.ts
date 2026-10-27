@@ -1,5 +1,6 @@
 /** Shared helpers and styling for the Futura cards. */
 import { css, html, TemplateResult, unsafeCSS } from 'lit';
+import { text, type StringKey } from './i18n';
 import * as t from './tokens';
 
 /**
@@ -28,6 +29,12 @@ export interface Hass {
     data?: Record<string, unknown>,
   ) => Promise<unknown>;
   localize?: (key: string) => string;
+  /**
+   * The frontend's language. `locale.language` is the current field and
+   * `language` the older one; i18n.ts prefers the first and accepts either.
+   */
+  language?: string;
+  locale?: { language?: string };
 }
 
 /** Resolve an entity's numeric state, or undefined when it is not usable. */
@@ -57,14 +64,16 @@ export function fmt(value: number | undefined, digits = 1): string {
   return value === undefined ? '--' : value.toFixed(digits);
 }
 
-/** Render seconds as a compact countdown. */
-export function countdown(seconds: number | undefined): string {
+/** Render seconds as a compact countdown, in the frontend's language. */
+export function countdown(hass: Hass | undefined, seconds: number | undefined): string {
   if (!seconds || seconds <= 0) return '';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m`;
-  return `${seconds}s`;
+  const h = text(hass, 'hourShort');
+  const m = text(hass, 'minuteShort');
+  if (hours > 0) return `${hours}${h} ${minutes}${m}`;
+  if (minutes > 0) return `${minutes}${m}`;
+  return `${seconds}${text(hass, 'secondShort')}`;
 }
 
 /**
@@ -87,15 +96,15 @@ export type Metric = 'co2' | 'temperature' | 'humidity';
  */
 export const METRICS: Record<
   Metric,
-  { label: string; unit: string; icon: string; digits: number; min: number; max: number }
+  { label: StringKey; unit: string; icon: string; digits: number; min: number; max: number }
 > = {
-  co2: { label: 'CO₂', unit: 'ppm', icon: 'mdi:leaf', digits: 0, min: 400, max: 1200 },
+  co2: { label: 'metricCo2', unit: 'ppm', icon: 'mdi:leaf', digits: 0, min: 400, max: 1200 },
   temperature: {
-    label: 'Temperature', unit: '°C', icon: 'mdi:thermometer', digits: 1,
+    label: 'metricTemperature', unit: '°C', icon: 'mdi:thermometer', digits: 1,
     min: 18, max: 28,
   },
   humidity: {
-    label: 'Humidity', unit: '%', icon: 'mdi:water-percent', digits: 0,
+    label: 'metricHumidity', unit: '%', icon: 'mdi:water-percent', digits: 0,
     min: 30, max: 70,
   },
 };
@@ -138,7 +147,20 @@ export function deviceId(hass: Hass | undefined, entityId: string): string | und
   return hass?.entities?.[entityId]?.device_id ?? undefined;
 }
 
-/** Drop the device name and the trailing metric from a friendly name. */
+/** Regex-safe form of a word that comes from a translation file. */
+const escape = (word: string) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Drop the device name and the trailing metric from a friendly name.
+ *
+ * The tile already says which metric it shows -- the grid has one heading and
+ * one unit for all of them -- so repeating it on every tile costs the room the
+ * sensor's own name needs. The metric is stripped in the frontend's language as
+ * well as in English, because `friendly_name` arrives translated: in Ukrainian
+ * these read "ALFA 3 — температура", and stripping only the English word would
+ * leave every tile ending in the same six letters. The separator that is left
+ * behind goes with it.
+ */
 export function shortName(
   hass: Hass | undefined,
   entityId: string,
@@ -154,10 +176,12 @@ export function shortName(
   const bare = deviceName && friendly.toLowerCase().startsWith(deviceName.toLowerCase())
     ? friendly.slice(deviceName.length)
     : friendly.replace(/^Jablotron Futura\s*/i, '');
-  return bare
-    .replace(/\sCO2$/i, '')
-    .replace(new RegExp(`\\s*${metric}$`, 'i'), '')
-    .trim();
+  const metricWords = [metric, 'CO2', 'CO₂', text(hass, METRICS[metric].label)];
+  const stripped = metricWords.reduce(
+    (name, word) => name.replace(new RegExp(`\\s*${escape(word)}$`, 'i'), ''),
+    bare,
+  );
+  return stripped.replace(/[\s\u2014\u2013-]+$/, '').trim();
 }
 
 export function errorRow(message: string): TemplateResult {

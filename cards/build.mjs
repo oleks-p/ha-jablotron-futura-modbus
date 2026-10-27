@@ -17,6 +17,9 @@ const options = {
   format: 'esm',
   target: 'es2021',
   minify: true,
+  // Without this esbuild escapes every non-ASCII character, which turns each
+  // Ukrainian string into six bytes per letter.
+  charset: 'utf8',
   sourcemap: false,
   legalComments: 'none',
   banner: { js: '/* Jablotron Futura Lovelace cards - generated, do not edit */' },

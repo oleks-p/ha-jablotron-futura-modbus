@@ -28,6 +28,7 @@ import {
   sharedStyles,
   shortName,
 } from './shared';
+import { text } from './i18n';
 
 export interface HistoryCardConfig {
   type: string;
@@ -95,7 +96,8 @@ export class FuturaHistoryCard extends LitElement {
   }
 
   private get chartTitle(): string {
-    return this.config.title ?? `${METRICS[this.metric].label} per sensor`;
+    return this.config.title
+      ?? text(this.hass, 'perSensor', { metric: text(this.hass, METRICS[this.metric].label) });
   }
 
   /** Build or refresh the inner card when the discovered entities change. */

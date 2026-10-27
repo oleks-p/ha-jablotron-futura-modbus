@@ -16,6 +16,7 @@
  */
 import { LitElement, type PropertyDeclarations, css, html, nothing, svg, type TemplateResult } from 'lit';
 import { type Hass, DEFAULT_PREFIX, cssVal, errorRow, num, sharedStyles } from './shared';
+import { text, type StringKey } from './i18n';
 import * as t from './tokens';
 import { type Shell, casing, collars, cubicLength, evenPitch, makeShell } from './unit-shell';
 
@@ -309,7 +310,7 @@ export class FuturaSchematicCard extends LitElement {
         ${wear === undefined ? '--' : Math.round(wear)} %
       </text>
       <text x=${px + pw / 2} y=${py + ph * 0.82} text-anchor="middle"
-            font-size="16" fill=${t.DRAW.dim}>Filter</text>
+            font-size="16" fill=${t.DRAW.dim}>${text(this.hass, 'filter')}</text>
     `;
   }
 
@@ -444,24 +445,24 @@ export class FuturaSchematicCard extends LitElement {
     // floor sweep; higher and it sits in the middle of the empty panel.
     const base = y + Math.round(h * 0.735);
     const block = (
-      cx: number, anchor: 'start' | 'end', label: string,
+      cx: number, anchor: 'start' | 'end', label: StringKey,
       pct: number | undefined, rpm: number | undefined,
     ) => svg`
       <text x=${cx} y=${base} text-anchor=${anchor} font-size="17" fill=${t.DRAW.fainter}>
-        ${label}
+        ${text(this.hass, label)}
       </text>
       <text x=${cx} y=${base + 27} text-anchor=${anchor}
             font-size="24" font-weight="700" fill=${t.DRAW.ink}>
         ${pct === undefined ? '--' : Math.round(pct)} %
       </text>
       <text x=${cx} y=${base + 51} text-anchor=${anchor} font-size="18" fill=${t.DRAW.dim}>
-        ${rpm === undefined ? '--' : Math.round(rpm)} rpm
+        ${rpm === undefined ? '--' : Math.round(rpm)} ${text(this.hass, 'rpm')}
       </text>
     `;
     return svg`
-      ${block(SHELL.collarX[0] + 34, 'start', 'Supply',
+      ${block(SHELL.collarX[0] + 34, 'start', 'supply',
               this.reading('supply_fan_output'), this.reading('supply_fan_speed'))}
-      ${block(SHELL.collarX[3] - 34, 'end', 'Exhaust',
+      ${block(SHELL.collarX[3] - 34, 'end', 'exhaust',
               this.reading('exhaust_fan_output'), this.reading('exhaust_fan_speed'))}
     `;
   }
@@ -470,7 +471,9 @@ export class FuturaSchematicCard extends LitElement {
     if (!this.hass) return html`<ha-card></ha-card>`;
     const probe = `${this.entityPrefix}_outside_air_temperature`;
     if (!this.hass.states[probe]) {
-      return html`<ha-card>${errorRow(`Entity ${probe} not found.`)}</ha-card>`;
+      return html`<ha-card>
+        ${errorRow(text(this.hass, 'entityMissing', { entity: probe }))}
+      </ha-card>`;
     }
 
     return html`
@@ -480,7 +483,7 @@ export class FuturaSchematicCard extends LitElement {
           : nothing}
         <div class="stage">
           <svg viewBox="0 0 ${W} ${H}" role="img"
-               aria-label="Ventilation unit: duct readings, fans and filter">
+               aria-label=${text(this.hass, 'ariaService')}>
             ${DUCTS.map((duct) => FuturaSchematicCard.arrow(duct))}
             ${FuturaSchematicCard.house()}
             ${collars(SHELL)}

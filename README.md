@@ -127,6 +127,47 @@ wherever it is placed. Set `theme_aware: true` to have it follow the active Home
 Assistant theme instead, and `show_toggle`, `show_legend` or `show_filter` to
 `false` to trim it down.
 
+## Languages
+
+Everything on screen is translated: entity names, the selects and their options,
+the config and options dialogs, the services, and the words the cards draw
+themselves. English and Ukrainian ship; Home Assistant falls back to English for
+any string a language file is missing, one string at a time.
+
+| Where the words live | File |
+| --- | --- |
+| Entity names, selects, config flow, services | `custom_components/jablotron_futura_modbus/translations/<lang>.json` |
+| What the cards draw -- "Supply", "BYPASS", "Filter clogging" | `cards/src/strings/<lang>.json` |
+| The dashboard's own headings and chart titles | `tools/localise_dashboard.py` |
+
+To add a language, copy `translations/en.json` and `cards/src/strings/en.json`,
+translate the values, and add the file to `TABLES` in `cards/src/i18n.ts`. The
+English entity names are generated from the register table, so run
+`python3 tools/gen_translations.py` rather than editing `strings.json` by hand;
+`tests/test_translations.py` and `tests/test_card_strings.py` fail naming any
+string that was missed.
+
+**Entity ids stay English** in most languages, including Ukrainian, so the
+dashboards here keep working whatever the frontend is set to. Home Assistant
+builds ids from the native language for a handful of locales -- Czech among them
+-- and on a Czech install the ids would be Czech and
+[`dashboards/futura.yaml`](dashboards/futura.yaml) would not match them.
+
+### A dashboard in another language
+
+The dashboard's tiles carry no `name:` of their own, so each one shows the
+entity's translated name. Its remaining text -- section headings, chart titles,
+the names on chart series -- is literal YAML belonging to no entity, so it is
+translated by a tool rather than by Home Assistant:
+
+```bash
+python3 tools/localise_dashboard.py       # writes dashboards/futura.<lang>.yaml
+```
+
+[`dashboards/futura.uk.yaml`](dashboards/futura.uk.yaml) is that output,
+committed. Edit the English file -- it is the one with the comments explaining
+each choice -- and regenerate.
+
 ## Multiple units
 
 Add each unit through **Add integration** in turn. Each one is its own device

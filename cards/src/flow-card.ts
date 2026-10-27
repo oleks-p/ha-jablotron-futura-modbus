@@ -13,6 +13,7 @@
  */
 import { LitElement, type PropertyDeclarations, css, html, nothing, svg, type TemplateResult } from 'lit';
 import { type Hass, DEFAULT_PREFIX, cssVal, errorRow, num, sharedStyles, str } from './shared';
+import { text } from './i18n';
 import * as t from './tokens';
 
 export interface FlowCardConfig {
@@ -429,9 +430,13 @@ export class FuturaFlowCard extends LitElement {
       : quality === 'poor' ? t.BAD
       : quality === 'moderate' ? t.WARN
       : t.NO_DATA;
-    const label = quality
-      ? quality[0].toUpperCase() + quality.slice(1)
-      : 'Unknown';
+    const label = text(
+      this.hass,
+      quality === 'good' ? 'qualityGood'
+      : quality === 'moderate' ? 'qualityModerate'
+      : quality === 'poor' ? 'qualityPoor'
+      : 'qualityUnknown',
+    );
     const kw = recovered === undefined
       ? '--'
       : (recovered / 1000).toFixed(1).replace('.', ',');
@@ -444,11 +449,11 @@ export class FuturaFlowCard extends LitElement {
               font-size="35" font-weight="600"
               fill="var(--app-text)">${label}</text>
         <text x=${INFO_CX} y="310" font-size="27"
-              fill="var(--app-dim)">Air quality</text>
+              fill="var(--app-dim)">${text(this.hass, 'airQuality')}</text>
         <text x=${INFO_CX} y="374" font-size="35" font-weight="600"
               fill="var(--app-text)">${kw} kW</text>
         <text x=${INFO_CX} y="410" font-size="27"
-              fill="var(--app-dim)">Recovered</text>
+              fill="var(--app-dim)">${text(this.hass, 'recovered')}</text>
       </g>
     `;
   }
@@ -473,7 +478,7 @@ export class FuturaFlowCard extends LitElement {
               stroke-linecap="round" />
         <text data-measure="outdoor" x=${outdoor.textCx} y=${OUTDOOR_Y}
               text-anchor="middle" font-size="27"
-              fill="var(--app-dim)">Outdoor</text>
+              fill="var(--app-dim)">${text(this.hass, 'outdoor')}</text>
         <text x=${INFO_CX} y=${OUTDOOR_Y + 52} text-anchor="middle"
               font-size="40" font-weight="600" fill="var(--app-text)">
           ${FuturaFlowCard.decimal(temperature)}<tspan
@@ -510,7 +515,7 @@ export class FuturaFlowCard extends LitElement {
     return html`
       <div class="filter">
         <div class="head">
-          <span class="name">Filter clogging</span>
+          <span class="name">${text(this.hass, 'filterClogging')}</span>
           <span class="pct">${Math.round(wear)} %</span>
         </div>
         <div class="bar"><span style=${`width:${pct}%`}></span></div>
@@ -525,7 +530,8 @@ export class FuturaFlowCard extends LitElement {
     if (ambient && !this.hass.states[ambient]) {
       return html`<ha-card>
         ${errorRow(
-          `Entity ${ambient} not found. Set "prefix" or name the entities explicitly.`,
+          `${text(this.hass, 'entityMissing', { entity: ambient })} `
+          + text(this.hass, 'setPrefixHint'),
         )}
       </ha-card>`;
     }
@@ -534,7 +540,7 @@ export class FuturaFlowCard extends LitElement {
       <ha-card>
         <div class="schematic">
           <svg viewBox="0 0 ${W} ${H}" role="img"
-               aria-label="Air flow through the heat exchanger">
+               aria-label=${text(this.hass, 'ariaFlow')}>
             <defs>
               <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stop-color=${t.GREY.darker} />

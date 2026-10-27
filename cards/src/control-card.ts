@@ -23,6 +23,7 @@ import {
   sharedStyles,
   str,
 } from './shared';
+import { text, type StringKey } from './i18n';
 import * as t from './tokens';
 
 export interface ControlCardConfig {
@@ -39,49 +40,12 @@ export interface ControlCardConfig {
 }
 
 /**
- * Every user-visible string, so a dashboard in another language can supply its
- * own without a second copy of the card. Unknown keys are ignored and missing
- * ones fall back to English, so a partial translation degrades one string at a
- * time rather than blanking the card.
+ * The card's strings live in i18n.ts, which ships English and Ukrainian and
+ * falls back key by key. `labels` in the card's config still overrides any one
+ * of them, for a dashboard that wants different wording or a language the cards
+ * do not ship yet.
  */
-const DEFAULT_LABELS = {
-  ventilation: 'Ventilation',
-  auto: 'Auto',
-  temperature: 'Temperature',
-  now: 'now',
-  humidity: 'Humidity',
-  dry: 'Dry',
-  comfort: 'Comfort',
-  wet: 'Wet',
-  functions: 'Functions',
-  boost: 'Boost',
-  circulation: 'Circulation',
-  overpressure: 'Overpressure',
-  night: 'Night',
-  party: 'Party',
-  stopAll: 'Stop all',
-  vacancy: 'Vacancy',
-  from: 'From',
-  until: 'Until',
-  clearVacancy: 'Cancel vacancy',
-  save: 'Save',
-  duration: 'Duration',
-  off: 'Off',
-  cancel: 'Cancel',
-  start: 'Start',
-  stop: 'Stop',
-  left: 'left',
-  stopping: 'Stopping…',
-  stoppingHint: 'Waiting for the unit to confirm.',
-  overriddenTitle: 'The unit restarted this function',
-  overriddenBody:
-    'The stop was accepted but the function is still running, so something on '
-    + 'the unit is holding it on — typically a latched kitchen-hood or boost '
-    + 'input, an ALFA controller setting, or a wall button. Clear it there and '
-    + 'stop again.',
-} as const;
-
-type LabelKey = keyof typeof DEFAULT_LABELS;
+type LabelKey = StringKey;
 
 const LEVELS = ['off', '1', '2', '3', '4', '5', 'auto'] as const;
 
@@ -216,14 +180,19 @@ const STOP_GRACE_MS = 35_000;
  */
 const STOP_MIN_DWELL_MS = 6_000;
 
-function formatMinutes(minutes: number): string {
-  if (minutes <= 0) return 'Off';
+function formatMinutes(t: Lookup, minutes: number): string {
+  if (minutes <= 0) return t('off');
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
-  if (hours && rest) return `${hours} h ${rest} min`;
-  if (hours) return `${hours} h`;
-  return `${rest} min`;
+  const h = t('hourShort');
+  const min = t('minuteLong');
+  if (hours && rest) return `${hours} ${h} ${rest} ${min}`;
+  if (hours) return `${hours} ${h}`;
+  return `${rest} ${min}`;
 }
+
+/** The card's own string lookup, passed to the helpers that render text. */
+type Lookup = (key: StringKey, vars?: Record<string, string | number>) => string;
 
 export class FuturaControlCard extends LitElement {
   static override properties: PropertyDeclarations = {
@@ -646,8 +615,13 @@ export class FuturaControlCard extends LitElement {
   }
 
   /** A visible string, translated if the dashboard supplied an override. */
-  private t(key: LabelKey): string {
-    return this.config.labels?.[key] ?? DEFAULT_LABELS[key];
+  private t(key: LabelKey, vars?: Record<string, string | number>): string {
+    return this.config.labels?.[key] ?? text(this.hass, key, vars);
+  }
+
+  /** `t` as a value, for the helpers that render text outside the class. */
+  private get lookup(): Lookup {
+    return (key, vars) => this.t(key, vars);
   }
 
   private get humidityEntity(): string {
@@ -978,7 +952,7 @@ export class FuturaControlCard extends LitElement {
           class="dialog"
           role="dialog"
           aria-modal="true"
-          aria-label=${`${fn.label} duration`}
+          aria-label=${this.t('ariaFunctionDuration', { function: this.t(fn.label) })}
           @keydown=${(event: KeyboardEvent) => {
             if (event.key === 'Escape') this.closePicker();
           }}
@@ -988,14 +962,14 @@ export class FuturaControlCard extends LitElement {
             <span>${this.t(fn.label)}</span>
             ${running > 0
               ? html`<span class="running">
-                  ${countdown(running)} ${this.t('left')}
+                  ${countdown(this.hass, running)} ${this.t('left')}
                 </span>`
               : nothing}
           </div>
 
           ${this.stopState?.fn.key === fn.key
             ? this.stopNotice()
-            : html`<div class="readout">${formatMinutes(minutes)}</div>`}
+            : html`<div class="readout">${formatMinutes(this.lookup, minutes)}</div>`}
 
           ${this.stopState?.fn.key === fn.key ? nothing : html`
           <input
@@ -1005,14 +979,14 @@ export class FuturaControlCard extends LitElement {
             max=${max}
             step=${STEP_MINUTES}
             .value=${String(minutes)}
-            aria-label="Duration in minutes"
+            aria-label=${this.t('ariaDuration')}
             @input=${(event: Event) => {
               const value = Number((event.target as HTMLInputElement).value);
               this.picker = { fn, minutes: value };
             }}
           />
           <div class="scale">
-            <span>${this.t('off')}</span><span>${formatMinutes(max)}</span>
+            <span>${this.t('off')}</span><span>${formatMinutes(this.lookup, max)}</span>
           </div>`}
 
           <div class="quick" ?hidden=${this.stopState?.fn.key === fn.key}>
@@ -1023,7 +997,7 @@ export class FuturaControlCard extends LitElement {
                     class=${m === minutes ? 'chip on' : 'chip'}
                     @click=${() => { this.picker = { fn, minutes: m }; }}
                   >
-                    ${formatMinutes(m)}
+                    ${formatMinutes(this.lookup, m)}
                   </button>
                 `,
               )}
@@ -1071,7 +1045,9 @@ export class FuturaControlCard extends LitElement {
               <button
                 class="level"
                 aria-pressed=${current === level ? 'true' : 'false'}
-                title=${level === 'off' ? 'Off' : level === 'auto' ? 'Automatic' : `Level ${level}`}
+                title=${level === 'off' ? this.t('off')
+                  : level === 'auto' ? this.t('automatic')
+                  : this.t('level', { level })}
                 @click=${() => this.setLevel(level)}
               >
                 ${level === 'off' ? '0' : level === 'auto' ? 'A' : level}
@@ -1103,7 +1079,7 @@ export class FuturaControlCard extends LitElement {
           <button
             ?disabled=${this.atLimit(-0.5)}
             @click=${() => this.nudge(-0.5)}
-            aria-label="Lower target"
+            aria-label=${this.t('ariaLower')}
           >
             &minus;
           </button>
@@ -1113,7 +1089,7 @@ export class FuturaControlCard extends LitElement {
           <button
             ?disabled=${this.atLimit(0.5)}
             @click=${() => this.nudge(0.5)}
-            aria-label="Raise target"
+            aria-label=${this.t('ariaRaise')}
           >
             &plus;
           </button>
@@ -1165,7 +1141,7 @@ export class FuturaControlCard extends LitElement {
         <div class="chips">
           ${available.map((fn) => {
             const active = isOn(this.hass, fn.active);
-            const left = countdown(num(this.hass, fn.remaining));
+            const left = countdown(this.hass, num(this.hass, fn.remaining));
             return html`
               <button
                 class="chip"
@@ -1195,13 +1171,15 @@ export class FuturaControlCard extends LitElement {
     if (!this.hass) return html`<ha-card></ha-card>`;
     if (!this.hass.states[this.selectEntity]) {
       return html`<ha-card>
-        ${errorRow(`Entity ${this.selectEntity} not found.`)}
+        ${errorRow(this.t('entityMissing', { entity: this.selectEntity }))}
       </ha-card>`;
     }
     return html`
       <ha-card>
-        ${this.config.title
-          ? html`<div class="title">${this.config.title}</div>`
+        <!-- No title in the config means the card's own heading, in the
+             frontend's language; an empty one means no heading at all. -->
+        ${(this.config.title ?? this.t('controls'))
+          ? html`<div class="title">${this.config.title ?? this.t('controls')}</div>`
           : nothing}
         ${this.ventilation()} ${this.temperature()} ${this.humidity()}
         ${this.functions()} ${this.pickerDialog()} ${this.awayDialog()}

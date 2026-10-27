@@ -18,49 +18,12 @@ import sys
 
 import pytest
 
+from tests.ukrainian import leaves as _leaves
+from tests.ukrainian import strip_proper as _strip_proper
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 COMPONENT = ROOT / "custom_components" / "jablotron_futura_modbus"
 sys.path.insert(0, str(ROOT / "tools"))
-
-
-#: Words that are legitimately Latin in a Ukrainian string: brand names, units,
-#: protocol terms, and `Boost` -- which stays untranslated because it is the word
-#: on the physical wall buttons and in this house's own entity names.
-PROPER_NOUNS = (
-    "°C",
-    "Boost",
-    "CoolBreeze",
-    "VarioBreeze",
-    "SuperBreeze",
-    "ALFA",
-    "Jablotron",
-    "Futura",
-    "Modbus",
-    "Home Assistant",
-    "Unit ID",
-    "TCP",
-    "holding",
-    "CO2",
-    "NTC",
-    "RTC",
-    "MAC",
-    "UIN1",
-    "UIN2",
-)
-
-
-def _strip_proper(text: str) -> str:
-    """Remove what is legitimately Latin, leaving only suspect words.
-
-    Placeholders go first: `{slot}` is a key Home Assistant substitutes into the
-    string, so its name stays English in every language.
-    """
-    import re
-
-    text = re.sub(r"\{\w+\}", "", text)
-    for word in PROPER_NOUNS:
-        text = text.replace(word, "")
-    return text
 
 
 def _load(name: str) -> dict:
@@ -223,16 +186,6 @@ def test_ukrainian_is_actually_ukrainian():
                     f"{domain}.{key}.{where} still has English in it: "
                     f"{leftover} in {text!r}"
                 )
-
-
-def _leaves(obj: object, path: str = "") -> set[str]:
-    """Every leaf path in a nested dict, so two files can be compared by shape."""
-    if isinstance(obj, dict):
-        out: set[str] = set()
-        for key, value in obj.items():
-            out |= _leaves(value, f"{path}.{key}" if path else key)
-        return out
-    return {path}
 
 
 def test_ukrainian_covers_config_options_and_services():
