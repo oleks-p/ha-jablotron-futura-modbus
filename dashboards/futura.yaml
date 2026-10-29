@@ -12,11 +12,19 @@
 # Sections are deliberately kept small: the sections view balances them across
 # columns, so one very tall section would otherwise leave the other column empty.
 #
-# No tile carries a `name:`. Each entity's name is written once, in the register
-# table, and Home Assistant hands it over in the frontend's language -- an
-# override here would be that name again, in English, on every install. The text
-# that is left is this file's own: headings, chart titles and the names on chart
-# series. `tools/localise_dashboard.py` translates those into
+# No card names an entity in words. Each entity's name is written once, in the
+# register table, and Home Assistant hands it over in the frontend's language --
+# a `name: Power` here would be that name again, in English, on every install.
+#
+# What every tile does carry is `name: {type: entity}`. A Home Assistant entity
+# name is the device's name plus the entity's own, so the friendly name of every
+# entity below begins "Jablotron Futura", and a column of tiles saying it
+# seventeen times pushes the part that differs off the end of the tile. That
+# option asks for the entity half alone. It names no text, so it is the same in
+# every language.
+#
+# The text that is left is this file's own: headings, chart titles and the names
+# on chart series. `tools/localise_dashboard.py` translates those into
 # `futura.<lang>.yaml`, which is what to deploy for a dashboard in another
 # language.
 views:
@@ -61,6 +69,8 @@ views:
           # to open the dialog; four buttons in a row are worth the width.
           - type: tile
             entity: select.jablotron_futura_schematic
+            name:
+              type: entity
             icon: mdi:vector-square
             features:
               - type: select-options
@@ -76,22 +86,38 @@ views:
             heading_style: subtitle
           - type: tile
             entity: sensor.jablotron_futura_power_consumption
+            name:
+              type: entity
           - type: tile
             entity: sensor.jablotron_futura_heat_recovered
+            name:
+              type: entity
           - type: tile
             entity: sensor.jablotron_futura_air_flow
+            name:
+              type: entity
           # The indoor mean and humidity mean are not repeated here: the flow
           # card already prints both, and the climate entity headlines them.
           - type: tile
             entity: sensor.jablotron_futura_outdoor_temperature
+            name:
+              type: entity
           - type: tile
             entity: sensor.jablotron_futura_supply_fan_speed
+            name:
+              type: entity
           - type: tile
             entity: sensor.jablotron_futura_exhaust_fan_speed
+            name:
+              type: entity
           - type: tile
             entity: sensor.jablotron_futura_supply_fan_output
+            name:
+              type: entity
           - type: tile
             entity: sensor.jablotron_futura_exhaust_fan_output
+            name:
+              type: entity
 
 
       - type: grid
@@ -109,16 +135,28 @@ views:
           # installed.
           - type: tile
             entity: switch.jablotron_futura_schedule         # holding 12
+            name:
+              type: entity
           - type: tile
             entity: switch.jablotron_futura_radon_protection  # holding 13
+            name:
+              type: entity
           - type: tile
             entity: switch.jablotron_futura_automatic_bypass  # holding 14
+            name:
+              type: entity
           - type: tile
             entity: switch.jablotron_futura_additional_heating  # holding 15
+            name:
+              type: entity
           - type: tile
             entity: switch.jablotron_futura_additional_cooling  # holding 16
+            name:
+              type: entity
           - type: tile
             entity: switch.jablotron_futura_comfort_temperature_control  # 17
+            name:
+              type: entity
           # A select, not a switch: 0 = temperature, 1 = CO2. No select-options
           # feature, so it stays one row and one column like its neighbours --
           # the current option shows as the tile's state, and a tap opens the
@@ -128,8 +166,12 @@ views:
           # any grid_options set here.
           - type: tile
             entity: select.jablotron_futura_zone_auto_priority  # holding 20
+            name:
+              type: entity
           - type: tile
             entity: switch.jablotron_futura_kitchen_hood_normally_open  # 21
+            name:
+              type: entity
 
 
       # Only appears when something is actually wrong.
@@ -144,7 +186,9 @@ views:
               type: entities
               title: Active faults
               entities:
-                - binary_sensor.jablotron_futura_fault
+                - entity: binary_sensor.jablotron_futura_fault
+                  name:
+                    type: entity
           - type: conditional
             conditions:
               - condition: state
@@ -154,7 +198,9 @@ views:
               type: entities
               title: Active warnings
               entities:
-                - binary_sensor.jablotron_futura_warning
+                - entity: binary_sensor.jablotron_futura_warning
+                  name:
+                    type: entity
 
 
       - type: grid

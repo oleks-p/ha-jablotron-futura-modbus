@@ -155,10 +155,16 @@ builds ids from the native language for a handful of locales -- Czech among them
 
 ### A dashboard in another language
 
-The dashboard's tiles carry no `name:` of their own, so each one shows the
-entity's translated name. Its remaining text -- section headings, chart titles,
-the names on chart series -- is literal YAML belonging to no entity, so it is
-translated by a tool rather than by Home Assistant:
+No card here names an entity in words, so each one shows the entity's
+translated name. Every tile does carry `name: {type: entity}`: a Home Assistant
+entity name is the device's plus the entity's own, so all of these begin
+"Jablotron Futura", and seventeen tiles repeating it push the part that differs
+off the end. That option asks for the entity half alone, and names no text, so
+it is the same in every language.
+
+The dashboard's remaining text -- section headings, chart titles, the names on
+chart series -- is literal YAML belonging to no entity, so it is translated by a
+tool rather than by Home Assistant:
 
 ```bash
 python3 tools/localise_dashboard.py       # writes dashboards/futura.<lang>.yaml

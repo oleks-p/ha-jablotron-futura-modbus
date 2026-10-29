@@ -20,6 +20,8 @@ views:
     cards:
     - type: tile
       entity: select.jablotron_futura_schematic
+      name:
+        type: entity
       icon: mdi:vector-square
       features:
       - type: select-options
@@ -34,20 +36,36 @@ views:
       heading_style: subtitle
     - type: tile
       entity: sensor.jablotron_futura_power_consumption
+      name:
+        type: entity
     - type: tile
       entity: sensor.jablotron_futura_heat_recovered
+      name:
+        type: entity
     - type: tile
       entity: sensor.jablotron_futura_air_flow
+      name:
+        type: entity
     - type: tile
       entity: sensor.jablotron_futura_outdoor_temperature
+      name:
+        type: entity
     - type: tile
       entity: sensor.jablotron_futura_supply_fan_speed
+      name:
+        type: entity
     - type: tile
       entity: sensor.jablotron_futura_exhaust_fan_speed
+      name:
+        type: entity
     - type: tile
       entity: sensor.jablotron_futura_supply_fan_output
+      name:
+        type: entity
     - type: tile
       entity: sensor.jablotron_futura_exhaust_fan_output
+      name:
+        type: entity
   - type: grid
     cards:
     - type: heading
@@ -55,20 +73,36 @@ views:
       heading_style: subtitle
     - type: tile
       entity: switch.jablotron_futura_schedule
+      name:
+        type: entity
     - type: tile
       entity: switch.jablotron_futura_radon_protection
+      name:
+        type: entity
     - type: tile
       entity: switch.jablotron_futura_automatic_bypass
+      name:
+        type: entity
     - type: tile
       entity: switch.jablotron_futura_additional_heating
+      name:
+        type: entity
     - type: tile
       entity: switch.jablotron_futura_additional_cooling
+      name:
+        type: entity
     - type: tile
       entity: switch.jablotron_futura_comfort_temperature_control
+      name:
+        type: entity
     - type: tile
       entity: select.jablotron_futura_zone_auto_priority
+      name:
+        type: entity
     - type: tile
       entity: switch.jablotron_futura_kitchen_hood_normally_open
+      name:
+        type: entity
   - type: grid
     cards:
     - type: conditional
@@ -80,7 +114,9 @@ views:
         type: entities
         title: Активні несправності
         entities:
-        - binary_sensor.jablotron_futura_fault
+        - entity: binary_sensor.jablotron_futura_fault
+          name:
+            type: entity
     - type: conditional
       conditions:
       - condition: state
@@ -90,7 +126,9 @@ views:
         type: entities
         title: Активні попередження
         entities:
-        - binary_sensor.jablotron_futura_warning
+        - entity: binary_sensor.jablotron_futura_warning
+          name:
+            type: entity
   - type: grid
     cards:
     - type: heading

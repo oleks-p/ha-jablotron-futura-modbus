@@ -65,6 +65,40 @@ def test_ukrainian_dashboard_has_no_english_left():
     assert not offenders, f"untranslated dashboard text: {offenders}"
 
 
+def test_every_entity_card_asks_for_the_entity_name():
+    """A card naming an entity must ask for the entity half of the name.
+
+    Home Assistant composes an entity's name from the device's and the entity's
+    own, so every friendly name here begins "Jablotron Futura". Left alone, a
+    column of tiles repeats that and truncates the word that actually differs --
+    `Jablotron Futura Спожива...`. `name: {type: entity}` asks for the second
+    half; this fails on a tile added without it, which is the only way the
+    prefix comes back.
+    """
+    paths = [localise.SOURCE]
+    paths += [
+        localise.SOURCE.with_suffix(f".{lang}.yaml") for lang in localise.LANGUAGES
+    ]
+    for path in paths:
+        bare = _tiles_without_entity_name(yaml.safe_load(path.read_text()))
+        assert not bare, f"{path.name}: tiles with no `name: {{type: entity}}`: {bare}"
+
+
+def _tiles_without_entity_name(
+    node: object, found: list[str] | None = None
+) -> list[str]:
+    found = [] if found is None else found
+    if isinstance(node, dict):
+        if node.get("type") == "tile" and node.get("name") != {"type": "entity"}:
+            found.append(str(node.get("entity")))
+        for value in node.values():
+            _tiles_without_entity_name(value, found)
+    elif isinstance(node, list):
+        for item in node:
+            _tiles_without_entity_name(item, found)
+    return found
+
+
 def test_identifiers_are_not_translated():
     """Entity ids, paths and card types must come through untouched."""
     english = yaml.safe_load(localise.SOURCE.read_text())
