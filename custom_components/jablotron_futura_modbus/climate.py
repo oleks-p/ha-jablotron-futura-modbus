@@ -54,7 +54,11 @@ class FuturaClimate(FuturaEntity, ClimateEntity):
     """The unit's comfort target, mirroring the mobile app's main screen."""
 
     _attr_name = None
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    # Home Assistant 2026.11 reads the `native_` names and deprecates the
+    # others; the older releases this still supports read only those. With
+    # both on the class, 2026.11 uses the native ones and warns of nothing.
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_temperature_unit = _attr_native_temperature_unit
     _attr_target_temperature_step = TEMP_SETPOINT_STEP
     _attr_min_temp = TEMP_SETPOINT_MIN
     _attr_max_temp = TEMP_SETPOINT_MAX
@@ -79,11 +83,12 @@ class FuturaClimate(FuturaEntity, ClimateEntity):
         super()._handle_coordinator_update()
 
     @property
-    def current_temperature(self) -> float | None:
+    def native_current_temperature(self) -> float | None:
         # Match the app, which averages every connected room sensor rather than
         # reporting the extract-air duct probe.
         mean = self.coordinator.data.get("temp_mean_indoor")
         return mean if mean is not None else self.coordinator.data.get("temp_indoor")
+    current_temperature = native_current_temperature
 
     @property
     def current_humidity(self) -> int | None:
@@ -93,8 +98,9 @@ class FuturaClimate(FuturaEntity, ClimateEntity):
         return None if value is None else round(value)
 
     @property
-    def target_temperature(self) -> float | None:
+    def native_target_temperature(self) -> float | None:
         return self.coordinator.data.get("temperature_setpoint")
+    target_temperature = native_target_temperature
 
     @property
     def hvac_modes(self) -> list[HVACMode]:
